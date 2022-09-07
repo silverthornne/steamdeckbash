@@ -24,9 +24,14 @@ cat << "HEREDOCINTRO"
 
 HEREDOCINTRO
 
+## If the locations of the compatibility data and shader cache change in some future update, just update the next two variables to reflect the new location:
+sCompatDataPath="/home/deck/.local/share/Steam/steamapps/compatdata/$nSteamId/"
+sShaderCachePath="/home/deck/.local/share/Steam/steamapps/shadercache/$nSteamId/"
 sNumberRegEx='^[0-9]+$'
 bCompatData=0
 bShaderCache=0
+
+
 
 echo;
 ## The script proceeds if the Steam ID that's entered is an Integer (non-decimal number).
@@ -39,8 +44,6 @@ if ! [[ $nSteamId =~ $sNumberRegEx ]] ; then
   echo "Error: The Steam ID that you entered isn't valid."
   exit 1
 else
-  sCompatDataPath="/home/deck/.local/share/Steam/steamapps/compatdata/$nSteamId/"
-  sShaderCachePath="/home/deck/.local/share/Steam/steamapps/shadercache/$nSteamId/"
   echo; echo "You entered $nSteamId."
   echo "A valid number was entered. Validating directories."
   ## Code that validates whether the paths exist:"
@@ -76,7 +79,7 @@ if [[ $bCompatData == 1 && $bShaderCache == 1 ]]; then
   sTargetCompatDataPath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*);echo $sTargetCompatDataPath
   echo
   ############
-  cd $sShaderCachePath
+  cd "$sShaderCachePath"
   cd ..
   mv $nSteamId /run/media/mmcblk0p1/steamapps/shadercache/
   ln -s /run/media/mmcblk0p1/steamapps/shadercache/$nSteamId $nSteamId
@@ -106,7 +109,7 @@ fi
 if [[ $bCompatData == 0 && $bShaderCache == 1 ]]; then
   echo "|-This title has a shader cache but no compatibility data. The shader cache directory will be moved to the microSD card."
   echo
-  cd $sShaderCachePath
+  cd "$sShaderCachePath"
   cd ..
   mv $nSteamId /run/media/mmcblk0p1/steamapps/shadercache/
   ln -s /run/media/mmcblk0p1/steamapps/shadercache/$nSteamId $nSteamId
