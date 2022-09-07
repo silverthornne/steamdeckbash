@@ -7,7 +7,7 @@
 ################### to the micro SD card slot.                                                                                  ################
 ################### Important: This script needs the game's Steam ID to work. Do not proceed if you do not have the game's Steam ID. ###########
 ################### Obtain a game's Steam ID in the game's Properties from Steam and going to the Updates pane. The Steam ID is the App ID.#####
-################## Do not confuse the Steam ID with the Build ID. They're not the same thing.                                  #################
+################### Do not confuse the Steam ID with the Build ID. They're not the same thing.                                  #################
 ## moveCacheToSd.sh ############################################################################################################################
 
 
@@ -29,8 +29,9 @@ bCompatData=0
 bShaderCache=0
 
 echo;
-
-echo "----------Please enter the game's Steam ID. Type any string that is not a number to exit.----------"
+## The script proceeds if the Steam ID that's entered is an Integer (non-decimal number).
+## The script will enter if any letters or symbols are detected. So typing any letter or symbol will abort it.
+echo "----------Please enter the game's Steam ID. The script will exit if you don't enter an Integer.----------"
 read -p "-> " nSteamId
 
 if ! [[ $nSteamId =~ $sNumberRegEx ]] ; then
@@ -62,7 +63,6 @@ echo "==========================================================================
 echo "------------------------------------------------------------------------------------------------------"
 echo "======================================================================================================"
 echo
-
 
 if [[ $bCompatData == 1 && $bShaderCache == 1 ]]; then
   echo "|-This title has compatibility data and shader cache. Both directories will be moved to the microSD card."
