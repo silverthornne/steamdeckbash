@@ -8,6 +8,7 @@
 ################### Important: This script needs the game's Steam ID to work. Do not proceed if you do not have the game's Steam ID. ###########
 ################### Obtain a game's Steam ID in the game's Properties from Steam and going to the Updates pane. The Steam ID is the App ID.#####
 ################### Do not confuse the Steam ID with the Build ID. They're not the same thing.                                  #################
+################### SCRIPT NOT READY FOR PRIME TIME!!!!! STILL NEED TO HANDLE WHEN THE ENTERED ID IS AN EXISTING LINK           ################
 ## moveCacheToSd.sh ############################################################################################################################
 
 
