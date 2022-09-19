@@ -3,7 +3,7 @@
 
 ############################################################################################################################# moveCacheToSd.sh##
 ###################                           Code by Antonio Rodrguez Negrn   |   silverthornne                                ################
-################### This is a simple script to move the shadercashe and compatdata directories for a specified title from internal storage #####
+################### This is a simple script to move the shadercache and compatdata directories for a specified title from internal storage #####
 ################### to the micro SD card slot.                                                                                  ################
 ################### Important: This script needs the game's Steam ID to work. Do not proceed if you do not have the game's Steam ID. ###########
 ################### Obtain a game's Steam ID in the game's Properties from Steam and going to the Updates pane. The Steam ID is the App ID.#####
