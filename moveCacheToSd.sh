@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+###### DON'T USE THIS ONE! DEPRECATED! USE "moveCacheLocation.sh" INSTEAD!!!!
 ############################################################################################################################# moveCacheToSd.sh##
 ###################                           Code by Antonio Rodrguez Negrn   |   silverthornne                                ################
 ################### This is a simple script to move the shadercache and compatdata directories for a specified title from internal storage #####
