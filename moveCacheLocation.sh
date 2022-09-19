@@ -1,10 +1,10 @@
 #!/bin/bash
 
-################### SCRIPT VERSION: 0.55 - NOT READY YET; JUST COMMITTING TO HAVE IT BACKED UP TO GITHUB - DO NOT USE YET ######################
+################### SCRIPT VERSION: 0.70 - NOT READY YET; JUST COMMITTING TO HAVE IT BACKED UP TO GITHUB - DO NOT USE YET ######################
 ####################################################################################################################### # moveCacheLocation.sh##
-###################                           Code by Antonio Rodriguez Negron   |   silverthornne                               ################
+###################                           Code by Antonio Rodriguez Negron   |   silverthornne                               ###############
 ################### This is a script to move the shadercache and compatdata directories for a specified title to the SD card or back to  #######
-################### to the internal storage in a Steam Deck (or probably other SteamOS devices).                                ################
+################### to the internal storage in a Steam Deck (may work in other SteamOS devices, but I have only tested on Deck!). ##############
 ################### Important: This script needs the game's Steam ID to work. Do not proceed if you do not have the game's Steam ID. ###########
 ################### Obtain a game's Steam ID in the game's Properties from Steam and going to the Updates pane. The Steam ID is the App ID.#####
 ################### Do not confuse the Steam ID with the Build ID. They're not the same thing.                                  ################
@@ -26,21 +26,23 @@ cat << "HEREDOCINTRO"
 
 HEREDOCINTRO
 
-## If the locations of the compatibility data and shader cache change in some future SteamOS update, just update these four *Root variables to reflect the new location:
+##### From my understanding, SteamDecks mount the Micro SD card in the following path. Change it if your MicroSD card has a different mounting point.
+sCardPath="/run/media/mmcblk0p1"
+##### If the locations of the compatibility data and shader cache change in some future SteamOS update, just update these *Root variables to reflect the new location:
 sLocalCompatDataRoot="/home/deck/.local/share/Steam/steamapps/compatdata/"
 sLocalShaderCacheRoot="/home/deck/.local/share/Steam/steamapps/shadercache/"
-sCardCompatDataRoot="/run/media/mmcblk0p1/steamapps/compatdata/"
-sCardShaderCacheRoot="/run/media/mmcblk0p1/steamapps/shadercache/"
+sCardCompatDataRoot="$sCardPath/steamapps/compatdata/"
+sCardShaderCacheRoot="$sCardPath/steamapps/shadercache/"
 #######################################################################################################################
 sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId/"
 sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId/"
 sCardCompatDataPath=/"$sCardCompatDataRoot/$nSteamId"
 sCardShaderCachePath="$sCardCompatDataRoot/$nSteamId"
+nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
+nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
+nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
+nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
 nLine=0
-nInternalFreeAbsolute=0
-nInternalFreeReadable=0
-nCardFreeAbsolute=0
-nCardFreeReadable=0
 nCompatDataSize=0
 nCompatDataSizeReadable=0
 nShaderCacheSize=0
@@ -51,7 +53,7 @@ sNumberRegEx='^[0-9]+$'
 echo;
 ## The script proceeds if the Steam ID that's entered is an Integer (non-decimal number).
 ## The script will enter if any letters or symbols are detected. So typing any letter or symbol will abort it.
-echo "----------Please enter the game's Steam ID. The script will exit if you don't enter an Integer.----------"
+echo "----------Please enter the game's Steam ID App ID. The script will exit if you don't enter a Steam App ID.----------"
 read -p "-> " nSteamId
 
 if ! [[ $nSteamId =~ $sNumberRegEx ]] ; then
@@ -71,11 +73,18 @@ else
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) ## This path will move the compatibility data directory to micro SD card. Checking space on card first.
-            nLine=$(df | grep -n "/run/media/mmcblk0p1" | grep -Eo '[0-9].*:'| grep -Eo [0-9].)
-            nCardFreeAbsolute=$(df | awk 'NR=='"$nLine"' {print $4}')
+            echo "Verifying available space on Micro SD card and size of compatibility data directory."
+            nCount=0
+              while [[ $nCount -lt 10 ]]; do
+              printf .
+              sleep 1s
+              ((nCount++))
+            done
+            nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
             nCompatDataSize=$(du $sLocalCompatDataPath -d 0 | cut -f1)
             if [[ $nCardFreeAbsolute -gt $nCompatDataSize ]]; then
-                echo "Moving compatibility data directory to micro SD card!"
+                echo "Moving compatibility data directory to micro SD card, please wait."
+                echo "Do not, under any circumstance, remove the micro SD card while running this script."
                 echo
                 nCount=0
                 while [[ $nCount -lt 10 ]]; do
@@ -88,16 +97,16 @@ else
                 mv $nSteamId $sCardCompatDataRoot
                 ln -s "$sCardCompatDataPath" $nSteamId
                 cd "$sLocalCompatDataRoot"
-                echo "Returning the value of the compatibility data symbolic link below:"
+                echo "Returning the value of the resulting compatibility data symbolic link below:"
                 echo
-                sTargetCompatDataPath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)echo $sTargetCompatDataPath
+                sTargetCompatDataPath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+                echo $sTargetCompatDataPath
                 echo
                 sleep 3s
-                nLine=$(df -h | grep -n "/run/media/mmcblk0p1" | grep -Eo '[0-9].*:'| grep -Eo [0-9].)
-                nCardFreeReadable=$(df | awk 'NR=='"$nLine"' {print $4}')
-                echo "Micro SD card has $nCardFreeReadable storage space left."
+                nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
+                echo "Micro SD card has $nCardFreeReadable storage space left after moving compatibility data to it."
             else
-              nCardFreeReadable=$(df | awk 'NR=='"$nLine"' {print $4}')
+              nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
               nCompatDataSizeReadable=$(du -h $sLocalCompatDataPath -d 0 | cut -f1)
               echo "There is not enough free space on the Micro SD card to move the compatibility data directory to it."
               echo "The Micro SD card needs $nCompatDataSizeReadable free, but it only has $nCardFreeReadable available."
@@ -122,34 +131,51 @@ else
       case $yn in
         Yes ) ## This path will move the compatibility data directory back to internal storage if it exists: ## Needs a bug check.
           if [[ -d "sCardCompatDataPath" ]]; then
-            echo "Verifying available internal storage space."
+            echo "Verifying size of compatibility data on Micro SD card and available Internal Storage space."
             nCount=0
             while [[ $nCount -lt 10 ]]; do
               printf .
               sleep 1s
               ((nCount++))
             done
-            nLine=$(df | grep -n "/home" | grep -Eo '[0-9].*:'| grep -Eo [0-9])
-            nInternalFree=$(df | awk 'NR=='"$nLine"' {print $4}')
-            echo "Available internal storage is $nInternalFree."
-
-
-
-
-            echo "Matching compatibility data directory found in Micro SD card slot. Validating size."
-
-
-
-
-
-
-
-          break;;
+            nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
+            nCompatDataSize=$(du $sCardCompatDataPath -d 0 | cut -f1)
+            if [[ $nInternalFreeAbsolute -gt $nCompatDataSize ]]; then
+              echo "Moving compatibility data from Micro SD to Internal Storage!"
+              echo
+              nCount=0
+              while [[ $nCount -lt 10 ]]; do
+                printf .
+                sleep 1s
+                ((nCount++))
+              done
+              echo
+              cd $sLocalCompatDataRoot
+              rm $nSteamId
+              cd $sCardCompatDataRoot
+              mv $nSteamId $sLocalCompatDataRoot
+              echo "Returning the value of the new compatibility data directory below:"
+              cd $sLocalCompatDataRoot
+              sTargetCompatDataPath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+              echo $sTargetCompatDataPath
+              echo
+              sleep 3s
+              nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
+              echo "Internal storage has $nInternalFreeReadable available after moving the selected compatibility files."
+            else
+              nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
+              nCompatDataSizeReadable=$(du -h "$sCardCompatDataPath" -d 0 | cut -f1)
+              echo "Internal storage only has $nInternalFreeReadable storage left."
+              echo "The compatibility data directory requires $nCompatDatasizeReadable available."
+              echo "That's not enough space to move the selected compatibility data from Micro SD card to Internal Storage."
+              echo
+            fi
+          fi
+        break;;
        No ) ## This path will not move the compatibility data directory back to internal storage
-
-
-
-
+          echo "Compatibility data won't be moved to Internal Storage as selected. Moving on."
+          sleep 3s
+          break;;
       esac
     done
   else
@@ -158,6 +184,10 @@ else
     sleep 3s
     echo
   fi
+  ############ Done with Compatibility Data.
+  ############ Shader Cache from this line on.
+  ############ Creepy crawlies are sure to be around.
+  ############ LET'S DO THEEEEEEZZZZZZ
   if [[ -d "$sLocalShaderCachePath" ]]; then
     ## Code that validates whether the internal shader cache data path exists:"
     echo "There is an internal storage shader cache directory for App ID $nSteamId."
@@ -167,8 +197,8 @@ else
       case $yn in
         Yes ) ## This path will move the shader cache directory to micro SD card:
           #### Need to add check for storage space
-          nLine=$(df | grep -n "/run/media/" | grep -Eo '[0-9].*:'| grep -Eo [0-9].)
-          nCardFreeAbsolute=$(df | awk 'NR=='"$nLine"' {print $4}')
+          nLine=$(df | grep -n "$sCardPath" | grep -Eo '[0-9].*:'| grep -Eo [0-9].)
+          nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
           nShaderCacheSize=$(du $sLocalShaderCachePath -d 0 | cut -f1)
           if [[ $nCardFreeAbsolute -gt $nShaderCacheSize ]]; then
             echo "Moving shader cache directory to micro SD card!"
@@ -186,11 +216,11 @@ else
             cd "$sLocalShaderCacheRoot"
             echo "Returning the value of the shader cache symbolic link below:"
             echo
-            sTargetShaderCachePath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)echo $sTargetShaderCachePath
+            sTargetShaderCachePath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+            echo $sTargetShaderCachePath
             echo
             sleep 3s
-            nLine=$(df -h | grep -n "/run/media/" | grep -Eo '[0-9].*:'| grep -Eo [0-9].)
-            nCardFreeReadable=$(df | awk 'NR=='"$nLine"' {print $4}')
+            nCardFreeReadable=$(df -h | grep -n "$sCardPath" | cut -d " " -f7)
             echo "Micro SD card has $nCardFreeReadable storage space left."
         else
            nCardFreeReadable=$(df | awk 'NR=='"$nLine"' {print $4}')
