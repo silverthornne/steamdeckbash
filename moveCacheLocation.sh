@@ -1,6 +1,6 @@
 #!/bin/bash
 
-################### SCRIPT VERSION: 0.85 - ALMOST FEATURE COMPLETE - STILL DOING QA; ONLY USE AT YOUR OWN RISK!!!  #############################
+################### SCRIPT VERSION: 1.0 - ALMOST FEATURE COMPLETE - STILL DOING QA; ONLY USE AT YOUR OWN RISK!!!  #############################
 ####################################################################################################################### # moveCacheLocation.sh##
 ###################                           Code by Antonio Rodriguez Negron   |   silverthornne                               ###############
 ################### This is a script to move the shadercache and compatdata directories for a specified title to the SD card or back to  #######
