@@ -95,7 +95,7 @@ else
                 done
                 echo
                 cd "$sLocalCompatDataRoot"
-                mv $nSteamId $sCardCompatDataRoot
+                /usr/bin/mv $nSteamId $sCardCompatDataRoot
                 ln -s "$sCardCompatDataPath" $nSteamId
                 cd "$sLocalCompatDataRoot"
                 echo
@@ -165,7 +165,7 @@ else
               cd $sLocalCompatDataRoot
               unlink $nSteamId
               cd $sCardCompatDataRoot
-              mv $nSteamId $sLocalCompatDataRoot
+              /usr/bin/mv $nSteamId $sLocalCompatDataRoot
               echo "Returning the value of the new compatibility data directory below:"
               cd $sLocalCompatDataRoot
               sTargetCompatDataPath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
@@ -236,7 +236,7 @@ else
             done
             echo
             cd "$sLocalShaderCacheRoot"
-            mv $nSteamId $sCardShaderCacheRoot
+            /usr/bin/mv $nSteamId $sCardShaderCacheRoot
             ln -s "$sCardShaderCachePath" $nSteamId
             cd "$sLocalShaderCacheRoot"
             echo "Returning the value of the shader cache symbolic link below:"
@@ -298,7 +298,7 @@ else
             cd $sLocalShaderCacheRoot
             unlink $nSteamId
             cd $sCardShaderCacheRoot
-            mv $nSteamId $sLocalShaderCacheRoot
+            /usr/bin/mv $nSteamId $sLocalShaderCacheRoot
             echo "Returning the value of the new shader cache directory below:"
             cd $sLocalShaderCacheRoot
             sTargetShaderCachePath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
