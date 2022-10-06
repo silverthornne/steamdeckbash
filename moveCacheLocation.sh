@@ -216,7 +216,7 @@ else
           echo
           echo "Verifying available space on Micro SD card and size of shader cache directory."
           nCount=0
-          while [[ $nCount -lt 10 ]]; do
+          while [[ $nCount -lt 5 ]]; do
             printf .
             sleep 1s
             ((nCount++))
@@ -229,7 +229,7 @@ else
             echo "Do not, under any circumstance, remove the micro SD card while this operation runs."
             echo
             nCount=0
-            while [[ $ncount -lt 10 ]]; do
+            while [[ $nCount -lt 5 ]]; do
               printf .
               sleep 1s
               ((nCount++))
@@ -277,7 +277,7 @@ else
             echo
             echo "Verifying size of shader cache data on Micro SD card and available Internal Storage space."
             nCount=0
-            while [[ $nCount -lt 10 ]]; do
+            while [[ $nCount -lt 5 ]]; do
               printf .
               sleep 1s
               ((nCount++))
@@ -289,7 +289,7 @@ else
             echo "Moving shader cache data from Micro SD card back to Internal Storage!"
             echo
             ncount=0
-            while [[ $nCount -lt 10 ]]; do
+            while [[ $nCount -lt 5 ]]; do
               printf .
               sleep 1s
               ((ncount++))
