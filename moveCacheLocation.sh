@@ -52,8 +52,8 @@ echo;
 echo "----------Please enter the game's Steam ID App ID. The script will exit if you don't enter a Steam App ID.----------"
 read -p "-> " nSteamId
 
-sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId/"
-sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId/"
+sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
+sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
 
 if ! [[ $nSteamId =~ $sNumberRegEx ]] ; then
   echo; echo "You entered App ID $nSteamId."
@@ -63,7 +63,7 @@ else
   echo; echo "You entered $nSteamId."
   echo "A valid number that may be a Steam ID for software in this system was entered. Validating directories."
   ## Code that validates whether the internal compatibility data path exists:"
-  if [[ -h "$sLocalCompatDataPath" && -f "$sLocalCompatDataPath" ]]; then
+  if [[ -h "$sLocalCompatDataPath" ]]; then
          ###### --------Handling when the data has already been moved to micro SD card.
          echo
          echo "The compatibility data for App ID $nSteamId has already been moved to a micro SD card."
