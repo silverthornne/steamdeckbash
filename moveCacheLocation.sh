@@ -64,8 +64,6 @@ else
   echo "A valid number that may be a Steam ID for software in this system was entered. Validating directories."
   ## Code that validates whether the internal compatibility data path exists:"
   if [[ -d "$sLocalCompatDataPath" ]]; then
-    echo "Debugging ----------------------"
-    echo "Returning directory name: $sLocalCompatDataPath"
     echo
     echo "There is an internal storage compatibility data directory for App ID $nSteamId."
     echo "A symbolic link will be created to maintain compatibility after moving the compatibility data directory."
