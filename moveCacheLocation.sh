@@ -29,10 +29,10 @@ HEREDOCINTRO
 ##### From my understanding, SteamDecks mount the Micro SD card in the following path. Change it if your MicroSD card has a different mounting point.
 sCardPath="/run/media/mmcblk0p1"
 ##### If the locations of the compatibility data and shader cache change in some future SteamOS update, just update these *Root variables to reflect the new location:
-sLocalCompatDataRoot="/home/deck/.local/share/Steam/steamapps/compatdata/"
-sLocalShaderCacheRoot="/home/deck/.local/share/Steam/steamapps/shadercache/"
-sCardCompatDataRoot="$sCardPath/steamapps/compatdata/"
-sCardShaderCacheRoot="$sCardPath/steamapps/shadercache/"
+sLocalCompatDataRoot="/home/deck/.local/share/Steam/steamapps/compatdata"
+sLocalShaderCacheRoot="/home/deck/.local/share/Steam/steamapps/shadercache"
+sCardCompatDataRoot="$sCardPath/steamapps/compatdata"
+sCardShaderCacheRoot="$sCardPath/steamapps/shadercache"
 #######################################################################################################################
 sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId/"
 sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId/"
