@@ -82,7 +82,7 @@ else
               ((nCount++))
             done
             nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
-            nCompatDataSize=$(du $sLocalCompatDataPath -d 0 | cut -f1)
+            nCompatDataSize=$(du "$sLocalCompatDataPath" -d 0 | cut -f1)
             if [[ $nCardFreeAbsolute -gt $nCompatDataSize ]]; then
                 echo;echo "Moving compatibility data directory to micro SD card, please wait."
                 echo "Do not, under any circumstance, remove the micro SD card while this operation runs."
@@ -95,21 +95,21 @@ else
                 done
                 echo
                 cd "$sLocalCompatDataRoot"
-                /usr/bin/mv $nSteamId $sCardCompatDataRoot
+                /usr/bin/mv $nSteamId "$sCardCompatDataRoot"
                 /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
                 cd "$sLocalCompatDataRoot"
                 echo
                 echo "Returning the value of the resulting compatibility data symbolic link below:"
                 echo
                 sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
-                echo $sTargetCompatDataPath
+                echo "$sTargetCompatDataPath"
                 echo
                 sleep 3s
                 nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
                 echo "Micro SD card has $nCardFreeReadable storage space left after moving compatibility data to it."
             else
               nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
-              nCompatDataSizeReadable=$(du -h $sLocalCompatDataPath -d 0 | cut -f1)
+              nCompatDataSizeReadable=$(du -h "$sLocalCompatDataPath" -d 0 | cut -f1)
               echo
               echo "There is not enough free space on the Micro SD card to move the compatibility data directory to it."
               echo "The Micro SD card needs $nCompatDataSizeReadable free, but it only has $nCardFreeReadable available."
@@ -150,7 +150,7 @@ else
               ((nCount++))
             done
             nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
-            nCompatDataSize=$(du $sCardCompatDataPath -d 0 | cut -f1)
+            nCompatDataSize=$(du "$sCardCompatDataPath" -d 0 | cut -f1)
             if [[ $nInternalFreeAbsolute -gt $nCompatDataSize ]]; then
               echo
               echo "Moving compatibility data back from Micro SD to Internal Storage!"
@@ -165,7 +165,7 @@ else
               cd $sLocalCompatDataRoot
               /usr/bin/unlink $nSteamId
               cd $sCardCompatDataRoot
-              /usr/bin/mv $nSteamId $sLocalCompatDataRoot
+              /usr/bin/mv $nSteamId "$sLocalCompatDataRoot"
               echo "Returning the value of the new compatibility data directory below:"
               cd $sLocalCompatDataRoot
               sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
@@ -236,13 +236,13 @@ else
             done
             echo
             cd "$sLocalShaderCacheRoot"
-            /usr/bin/mv $nSteamId $sCardShaderCacheRoot
+            /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
             /lsr/bin/ln -s "$sCardShaderCachePath" $nSteamId
             cd "$sLocalShaderCacheRoot"
             echo "Returning the value of the shader cache symbolic link below:"
             echo
             sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
-            echo $sTargetShaderCachePath
+            echo "$sTargetShaderCachePath"
             echo
             sleep 3s
             nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
@@ -295,12 +295,12 @@ else
               ((nCount++))
             done
             echo
-            cd $sLocalShaderCacheRoot
+            cd "$sLocalShaderCacheRoot"
             /usr/bin/unlink $nSteamId
-            cd $sCardShaderCacheRoot
-            /usr/bin/mv $nSteamId $sLocalShaderCacheRoot
+            cd "$sCardShaderCacheRoot"
+            /usr/bin/mv $nSteamId "$sLocalShaderCacheRoot"
             echo "Returning the value of the new shader cache directory below:"
-            cd $sLocalShaderCacheRoot
+            cd "$sLocalShaderCacheRoot"
             sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
             echo "$sTargetShaderCachePath"
             echo
