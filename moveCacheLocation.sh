@@ -63,135 +63,135 @@ else
   echo; echo "You entered $nSteamId."
   echo "A valid number that may be a Steam ID for software in this system was entered. Validating directories."
   ## Code that validates whether the internal compatibility data path exists:"
-  if [[ -d "$sLocalCompatDataPath" ]]; then
-    echo
-    echo "There is an internal storage compatibility data directory for App ID $nSteamId."
-    echo "A symbolic link will be created to maintain compatibility after moving the compatibility data directory."
-    echo "Do you wish to proceed?"
-    sleep 1s
-    echo
-    select yn in "Yes" "No"; do
-        case $yn in
-            Yes ) ## This path will move the compatibility data directory to micro SD card. Checking space on card first.
-            echo;echo "Verifying available space on Micro SD card and size of compatibility data directory."
-            nCount=0
-            while [[ $nCount -lt 5 ]]; do
-              printf .
-              sleep 1s
-              ((nCount++))
-            done
-            nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
-            nCompatDataSize=$(du "$sLocalCompatDataPath" -d 0 | cut -f1)
-            if [[ $nCardFreeAbsolute -gt $nCompatDataSize ]]; then
-                echo;echo "Moving compatibility data directory to micro SD card, please wait."
-                echo "Do not, under any circumstance, remove the micro SD card while this operation runs."
-                echo
-                nCount=0
-                while [[ $nCount -lt 10 ]]; do
-                  printf .
-                  sleep 1s
-                  ((nCount++))
-                done
-                echo
-                cd "$sLocalCompatDataRoot"
-                /usr/bin/mv $nSteamId "$sCardCompatDataRoot"
-                sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
-                /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
-                cd "$sLocalCompatDataRoot"
-                echo
-                echo "Returning the value of the resulting compatibility data symbolic link below:"
-                echo
-                sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
-                echo "$sTargetCompatDataPath"
-                echo
-                sleep 3s
-                nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
-                echo "Micro SD card has $nCardFreeReadable storage space left after moving compatibility data to it."
-            else
-              nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
-              nCompatDataSizeReadable=$(du -h "$sLocalCompatDataPath" -d 0 | cut -f1)
-              echo
-              echo "There is not enough free space on the Micro SD card to move the compatibility data directory to it."
-              echo "The Micro SD card needs $nCompatDataSizeReadable free, but it only has $nCardFreeReadable available."
-              echo
-          fi
-           break;;
-            No ) ## This path will not move compatibility files and move on to the shader cache files.
-              echo
-              echo "Compatibility data won't be moved to micro SD card. Moving on."
-              nCount=0
-              while [[ $nCount -lt 5 ]]; do
-                printf .
-                sleep 1s
-                ((nCount++))
-              done
-            break;;
-        esac
-    done
-  elif [[ -L "$sLocalCompatDataPath" ]]; then
-    ###### --------Handling when the data has already been moved to micro SD card.
-    echo
-    echo "The compatibility data for App ID $nSteamId has already been moved to a micro SD card."
-    ############ Code to verify if the files are located in the current micro SD card and to ask to move them to internal storage goes here:
-    sleep 1s
-    echo "Do you want to move the compatibility data back to internal storage if it is present in the micro SD card currently located in the Micro SD card slot?"
-    sleep 1s
-    echo
-    select yn in "Yes" "No"; do
-      case $yn in
-        Yes ) ## This path will move the compatibility data directory back to internal storage if it exists: ## Needs a bug check.
+  if [[ -L "$sLocalCompatDataPath" ]]; then
+         ###### --------Handling when the data has already been moved to micro SD card.
+         echo
+         echo "The compatibility data for App ID $nSteamId has already been moved to a micro SD card."
+         ############ Code to verify if the files are located in the current micro SD card and to ask to move them to internal storage goes here:
+         sleep 1s
+         echo "Do you want to move the compatibility data back to internal storage if it is present in the micro SD card currently located in the Micro SD card slot?"
+         sleep 1s
+         echo
+         select yn in "Yes" "No"; do
+           case $yn in
+             Yes ) ## This path will move the compatibility data directory back to internal storage if it exists: ## Needs a bug check.
+               echo
+               if [[ -d "$sCardCompatDataPath" ]]; then
+                 echo "Verifying size of compatibility data on Micro SD card and available Internal Storage space."
+                 nCount=0
+                 while [[ $nCount -lt 5 ]]; do
+                   printf .
+                   sleep 1s
+                   ((nCount++))
+                 done
+                 nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
+                 nCompatDataSize=$(du "$sCardCompatDataPath" -d 0 | cut -f1)
+                 if [[ $nInternalFreeAbsolute -gt $nCompatDataSize ]]; then
+                   echo
+                   echo "Moving compatibility data back from Micro SD to Internal Storage!"
+                   echo
+                   nCount=0
+                   while [[ $nCount -lt 10 ]]; do
+                     printf .
+                     sleep 1s
+                     ((nCount++))
+                   done
+                   echo
+                   cd $sLocalCompatDataRoot
+                   /usr/bin/unlink $nSteamId
+                   cd $sCardCompatDataRoot
+                   /usr/bin/mv $nSteamId "$sLocalCompatDataRoot"
+                   echo "Returning the value of the new compatibility data directory below:"
+                   cd $sLocalCompatDataRoot
+                   sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+                   echo "$sTargetCompatDataPath"
+                   echo
+                   sleep 3s
+                   nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
+                   echo "Internal storage has $nInternalFreeReadable available after moving the selected compatibility files back to it."
+                 else
+                   nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
+                   nCompatDataSizeReadable=$(du -h "$sCardCompatDataPath" -d 0 | cut -f1)
+                   echo
+                   echo "Internal storage only has $nInternalFreeReadable space left."
+                   echo "The compatibility data directory requires $nCompatDatasizeReadable of space available."
+                   echo "That's not enough space to move the selected compatibility data from Micro SD card back to Internal Storage."
+                   echo
+                 fi
+               fi
+             break;;
+            No ) ## This path will not move the compatibility data directory back to internal storage
+               echo
+               echo "Compatibility data won't be moved to Internal Storage as selected. Moving on."
+               sleep 3s
+               break;;
+           esac
+         done
+  elif [[ -d "$sLocalCompatDataPath" ]]; then
           echo
-          if [[ -d "$sCardCompatDataPath" ]]; then
-            echo "Verifying size of compatibility data on Micro SD card and available Internal Storage space."
-            nCount=0
-            while [[ $nCount -lt 5 ]]; do
-              printf .
-              sleep 1s
-              ((nCount++))
-            done
-            nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
-            nCompatDataSize=$(du "$sCardCompatDataPath" -d 0 | cut -f1)
-            if [[ $nInternalFreeAbsolute -gt $nCompatDataSize ]]; then
-              echo
-              echo "Moving compatibility data back from Micro SD to Internal Storage!"
-              echo
-              nCount=0
-              while [[ $nCount -lt 10 ]]; do
-                printf .
-                sleep 1s
-                ((nCount++))
-              done
-              echo
-              cd $sLocalCompatDataRoot
-              /usr/bin/unlink $nSteamId
-              cd $sCardCompatDataRoot
-              /usr/bin/mv $nSteamId "$sLocalCompatDataRoot"
-              echo "Returning the value of the new compatibility data directory below:"
-              cd $sLocalCompatDataRoot
-              sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
-              echo "$sTargetCompatDataPath"
-              echo
-              sleep 3s
-              nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
-              echo "Internal storage has $nInternalFreeReadable available after moving the selected compatibility files back to it."
-            else
-              nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
-              nCompatDataSizeReadable=$(du -h "$sCardCompatDataPath" -d 0 | cut -f1)
-              echo
-              echo "Internal storage only has $nInternalFreeReadable space left."
-              echo "The compatibility data directory requires $nCompatDatasizeReadable of space available."
-              echo "That's not enough space to move the selected compatibility data from Micro SD card back to Internal Storage."
-              echo
-            fi
-          fi
-        break;;
-       No ) ## This path will not move the compatibility data directory back to internal storage
+          echo "There is an internal storage compatibility data directory for App ID $nSteamId."
+          echo "A symbolic link will be created to maintain compatibility after moving the compatibility data directory."
+          echo "Do you wish to proceed?"
+          sleep 1s
           echo
-          echo "Compatibility data won't be moved to Internal Storage as selected. Moving on."
-          sleep 3s
-          break;;
-      esac
-    done
+          select yn in "Yes" "No"; do
+              case $yn in
+                  Yes ) ## This path will move the compatibility data directory to micro SD card. Checking space on card first.
+                  echo;echo "Verifying available space on Micro SD card and size of compatibility data directory."
+                  nCount=0
+                  while [[ $nCount -lt 5 ]]; do
+                    printf .
+                    sleep 1s
+                    ((nCount++))
+                  done
+                  nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
+                  nCompatDataSize=$(du "$sLocalCompatDataPath" -d 0 | cut -f1)
+                  if [[ $nCardFreeAbsolute -gt $nCompatDataSize ]]; then
+                      echo;echo "Moving compatibility data directory to micro SD card, please wait."
+                      echo "Do not, under any circumstance, remove the micro SD card while this operation runs."
+                      echo
+                      nCount=0
+                      while [[ $nCount -lt 10 ]]; do
+                        printf .
+                        sleep 1s
+                        ((nCount++))
+                      done
+                      echo
+                      cd "$sLocalCompatDataRoot"
+                      /usr/bin/mv $nSteamId "$sCardCompatDataRoot"
+                      sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
+                      /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
+                      cd "$sLocalCompatDataRoot"
+                      echo
+                      echo "Returning the value of the resulting compatibility data symbolic link below:"
+                      echo
+                      sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+                      echo "$sTargetCompatDataPath"
+                      echo
+                      sleep 3s
+                      nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
+                      echo "Micro SD card has $nCardFreeReadable storage space left after moving compatibility data to it."
+                  else
+                    nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
+                    nCompatDataSizeReadable=$(du -h "$sLocalCompatDataPath" -d 0 | cut -f1)
+                    echo
+                    echo "There is not enough free space on the Micro SD card to move the compatibility data directory to it."
+                    echo "The Micro SD card needs $nCompatDataSizeReadable free, but it only has $nCardFreeReadable available."
+                    echo
+                fi
+                 break;;
+                  No ) ## This path will not move compatibility files and move on to the shader cache files.
+                    echo
+                    echo "Compatibility data won't be moved to micro SD card. Moving on."
+                    nCount=0
+                    while [[ $nCount -lt 5 ]]; do
+                      printf .
+                      sleep 1s
+                      ((nCount++))
+                    done
+                  break;;
+              esac
+          done
   else
     echo
     echo "There is no compatibility data directory for App ID $nSteamId."
