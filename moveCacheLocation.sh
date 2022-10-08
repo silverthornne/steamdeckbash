@@ -76,7 +76,7 @@ else
             Yes ) ## This path will move the compatibility data directory to micro SD card. Checking space on card first.
             echo;echo "Verifying available space on Micro SD card and size of compatibility data directory."
             nCount=0
-            while [[ $nCount -lt 10 ]]; do
+            while [[ $nCount -lt 5 ]]; do
               printf .
               sleep 1s
               ((nCount++))
@@ -96,12 +96,12 @@ else
                 echo
                 cd "$sLocalCompatDataRoot"
                 /usr/bin/mv $nSteamId $sCardCompatDataRoot
-                ln -s "$sCardCompatDataPath" $nSteamId
+                /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
                 cd "$sLocalCompatDataRoot"
                 echo
                 echo "Returning the value of the resulting compatibility data symbolic link below:"
                 echo
-                sTargetCompatDataPath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+                sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
                 echo $sTargetCompatDataPath
                 echo
                 sleep 3s
@@ -144,7 +144,7 @@ else
           if [[ -d "$sCardCompatDataPath" ]]; then
             echo "Verifying size of compatibility data on Micro SD card and available Internal Storage space."
             nCount=0
-            while [[ $nCount -lt 10 ]]; do
+            while [[ $nCount -lt 5 ]]; do
               printf .
               sleep 1s
               ((nCount++))
@@ -163,12 +163,12 @@ else
               done
               echo
               cd $sLocalCompatDataRoot
-              unlink $nSteamId
+              /usr/bin/unlink $nSteamId
               cd $sCardCompatDataRoot
               /usr/bin/mv $nSteamId $sLocalCompatDataRoot
               echo "Returning the value of the new compatibility data directory below:"
               cd $sLocalCompatDataRoot
-              sTargetCompatDataPath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+              sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
               echo "$sTargetCompatDataPath"
               echo
               sleep 3s
@@ -237,11 +237,11 @@ else
             echo
             cd "$sLocalShaderCacheRoot"
             /usr/bin/mv $nSteamId $sCardShaderCacheRoot
-            ln -s "$sCardShaderCachePath" $nSteamId
+            /lsr/bin/ln -s "$sCardShaderCachePath" $nSteamId
             cd "$sLocalShaderCacheRoot"
             echo "Returning the value of the shader cache symbolic link below:"
             echo
-            sTargetShaderCachePath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+            sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
             echo $sTargetShaderCachePath
             echo
             sleep 3s
@@ -288,20 +288,20 @@ else
             echo
             echo "Moving shader cache data from Micro SD card back to Internal Storage!"
             echo
-            ncount=0
+            nCount=0
             while [[ $nCount -lt 5 ]]; do
               printf .
               sleep 1s
-              ((ncount++))
+              ((nCount++))
             done
             echo
             cd $sLocalShaderCacheRoot
-            unlink $nSteamId
+            /usr/bin/unlink $nSteamId
             cd $sCardShaderCacheRoot
             /usr/bin/mv $nSteamId $sLocalShaderCacheRoot
             echo "Returning the value of the new shader cache directory below:"
             cd $sLocalShaderCacheRoot
-            sTargetShaderCachePath=$(pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+            sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
             echo "$sTargetShaderCachePath"
             echo
             sleep 3s
