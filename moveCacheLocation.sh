@@ -34,8 +34,6 @@ sLocalShaderCacheRoot="/home/deck/.local/share/Steam/steamapps/shadercache"
 sCardCompatDataRoot="$sCardPath/steamapps/compatdata"
 sCardShaderCacheRoot="$sCardPath/steamapps/shadercache"
 #######################################################################################################################
-sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId/"
-sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId/"
 nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
 nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
 nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
@@ -54,6 +52,9 @@ echo;
 echo "----------Please enter the game's Steam ID App ID. The script will exit if you don't enter a Steam App ID.----------"
 read -p "-> " nSteamId
 
+sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId/"
+sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId/"
+
 if ! [[ $nSteamId =~ $sNumberRegEx ]] ; then
   echo; echo "You entered App ID $nSteamId."
   echo "Unable to proceed because the App ID that you entered isn't valid. Please verify the title's App ID and try again."
@@ -63,6 +64,8 @@ else
   echo "A valid number that may be a Steam ID for software in this system was entered. Validating directories."
   ## Code that validates whether the internal compatibility data path exists:"
   if [[ -d "$sLocalCompatDataPath" ]]; then
+    echo "Debugging ----------------------"
+    echo "Returning directory name: $sLocalCompatDataPath"
     echo
     echo "There is an internal storage compatibility data directory for App ID $nSteamId."
     echo "A symbolic link will be created to maintain compatibility after moving the compatibility data directory."
