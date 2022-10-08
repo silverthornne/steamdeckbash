@@ -36,8 +36,6 @@ sCardShaderCacheRoot="$sCardPath/steamapps/shadercache/"
 #######################################################################################################################
 sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId/"
 sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId/"
-sCardCompatDataPath=/"$sCardCompatDataRoot/$nSteamId"
-sCardShaderCachePath="$sCardCompatDataRoot/$nSteamId"
 nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
 nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
 nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
@@ -96,6 +94,7 @@ else
                 echo
                 cd "$sLocalCompatDataRoot"
                 /usr/bin/mv $nSteamId "$sCardCompatDataRoot"
+                sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
                 /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
                 cd "$sLocalCompatDataRoot"
                 echo
@@ -237,6 +236,7 @@ else
             echo
             cd "$sLocalShaderCacheRoot"
             /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
+            sCardShaderCachePath="$sCardCompatDataRoot/$nSteamId"
             /lsr/bin/ln -s "$sCardShaderCachePath" $nSteamId
             cd "$sLocalShaderCacheRoot"
             echo "Returning the value of the shader cache symbolic link below:"
