@@ -63,7 +63,7 @@ else
   echo; echo "You entered $nSteamId."
   echo "A valid number that may be a Steam ID for software in this system was entered. Validating directories."
   ## Code that validates whether the internal compatibility data path exists:"
-  if [[ -L "$sLocalCompatDataPath" ]]; then
+  if [[ -h "$sLocalCompatDataPath" ]]; then
          ###### --------Handling when the data has already been moved to micro SD card.
          echo
          echo "The compatibility data for App ID $nSteamId has already been moved to a micro SD card."
