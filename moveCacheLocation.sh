@@ -22,6 +22,15 @@ cat << "HEREDOCINTRO"
 | this script. Do not proceed without the game's Steam App ID. It can be obtained |
 | from the Updates pane within its Properties window. Do not confuse the App ID   |
 | with the Build ID; they're different. The Build ID will NOT work.               |
+| ================================================================================|
+|*Note: This script works best on games that were directly installed to microSD   |
+| card. If the game was installed to internal storage and moved to microSD card   |
+| later via Steam's \"Move install folder...\" option, Valve has already created  |
+| a compatibility data directory on the microSD card for it. However, Valve has   |
+| NOT created a pre-cached shader data directory on the microSD card for it. In   |
+| that case, the right thing to do is to skip the option to move compatibility    |
+| data files, and only move the pre-cached shader files to the microSD card.      |
+| This behavior may change in later SteamOS updates, so keep that in mind.        |
 \---------------------------------------------------------------------------------/
 
 HEREDOCINTRO
@@ -94,7 +103,7 @@ else
                    echo "Moving compatibility data back from Micro SD to Internal Storage!"
                    echo
                    nCount=0
-                   while [[ $nCount -lt 10 ]]; do
+                   while [[ $nCount -lt 5 ]]; do
                      printf .
                      sleep 1s
                      ((nCount++))
@@ -154,7 +163,7 @@ else
                       echo "Do not, under any circumstance, remove the micro SD card while this operation runs."
                       echo
                       nCount=0
-                      while [[ $nCount -lt 10 ]]; do
+                      while [[ $nCount -lt 5 ]]; do
                         printf .
                         sleep 1s
                         ((nCount++))
