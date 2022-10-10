@@ -54,6 +54,9 @@ read -p "-> " nSteamId
 
 sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
 sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
+sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
+sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
+
 
 if ! [[ $nSteamId =~ $sNumberRegEx ]] ; then
   echo; echo "You entered App ID $nSteamId."
