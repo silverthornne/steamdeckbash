@@ -64,21 +64,21 @@ sNumberRegEx='^[0-9]+$'
 
 
 echo;
-echo "This script is provided as-is, with no warranties written or implied."
-echo "The worst that could happen after running it is that you may have to manually move some files around if something unexpected happens."
-echo "I have performed numerous tests to make sure that it works as expected, but there may be a critter or two lurking about that I haven't caught."
-echo "With all of that out of the way, do you wish to proceed?"
+echo "===================This script is provided as-is, with no warranties written or implied.==================="; echo
+echo "The worst that could happen after running it is that you may have to manually move some files around if it fails."; echo
+echo "I have performed numerous tests to make sure that it works as expected, but there may be a critter or two lurking about that I haven't caught."; echo
+echo "=========================With all of that out of the way, do you wish to proceed?=========================="; echo
 
 select yn in "Yes" "No"; do
   case $yn in
     Yes )
       echo
-      echo "Proceeding with script."
+      echo "Once more unto the breach, dear friends!"
       echo
       break;;
     No )
       echo
-      echo "Exiting script"
+      echo "Goodbye!"
       exit 0
       break;;
   esac
