@@ -8,6 +8,17 @@
 ################### Important: This script needs the game's Steam ID to work. Do not proceed if you do not have the game's Steam ID. ###########
 ################### Obtain a game's Steam ID in the game's Properties from Steam and going to the Updates pane. The Steam ID is the App ID.#####
 ################### Do not confuse the Steam ID with the Build ID. They're not the same thing.                                  ################
+###################==============================================================================================================###############
+################### Oh YEA! Important stuff:                                                                                    ################
+###################                                                                                                             ################
+################### This script is provided as-is. No guarantees are written or implied. You may freely use this script but may ################
+################### not distribute it or include it on any custom distribution. Do feel free to fork it and modify it for your  ################
+################### own use though. The reality is that I don't really have the power to stop you from distributing this script ################
+################### against my wishes, but if you do so you will be cursed in such a way that, from the date that you choose to ################
+################### breach these conditions and distribute the script without permission, you'll feel an intense craving for    ################
+################### Oreo cookies. Every time you sit down to eat them you will get a nice bottle of milk, dunk them in it, and  ################
+################### egads! NO FILLING ON EVERY THIRD COOKIE! That's your curse! Intense craving for Oreos but every third one   ################
+################### will have no filling! So don't distribute this script without my permission. You've been warned.            ################
 ## moveCacheLocation.sh ########################################################################################################################
 
 
@@ -53,6 +64,26 @@ sNumberRegEx='^[0-9]+$'
 
 
 echo;
+echo "This script is provided as-is, with no warranties written or implied."
+echo "The worst that could happen after running it is that you may have to manually move some files around if something unexpected happens."
+echo "I have performed numerous tests to make sure that it works as expected, but there may be a critter or two lurking about that I haven't caught."
+echo "With all of that out of the way, do you wish to proceed?"
+
+select yn in "Yes" "No"; do
+  case $yn in
+    Yes )
+      echo
+      echo "Proceeding with script."
+      echo
+      break;;
+    No )
+      echo
+      echo "Exiting script"
+      exit 0
+      break;;
+  esac
+done
+
 ## The script proceeds if the Steam ID that's entered is an Integer (non-decimal number).
 ## The script will enter if any letters or symbols are detected. So typing any letter or symbol will abort it.
 echo "----------Please enter the game's Steam ID App ID. The script will exit if you don't enter a Steam App ID.----------"
@@ -279,7 +310,7 @@ else
             cd "$sLocalShaderCacheRoot"
             /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
             sCardShaderCachePath="$sCardCompatDataRoot/$nSteamId"
-            /lsr/bin/ln -s "$sCardShaderCachePath" $nSteamId
+            /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
             cd "$sLocalShaderCacheRoot"
             echo "Returning the value of the shader cache symbolic link below:"
             echo
