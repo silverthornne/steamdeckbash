@@ -13,25 +13,22 @@
 
 cat << "HEREDOCINTRO"
 
-/---------------------------------------------------------------------------------\
-| This shell script will move a game's internal compatibility and shader data     |
-| to the micro SD card slot or back to internal storage. Steam will continue to   |
-| access and update those files as if they were located internally. Performance   |
-| may see a slight hit when moving to the micro SD card based on SD card storage  |
-| access speed limitations. Please obtain the game's Steam App ID before running  |
-| this script. Do not proceed without the game's Steam App ID. It can be obtained |
-| from the Updates pane within its Properties window. Do not confuse the App ID   |
-| with the Build ID; they're different. The Build ID will NOT work.               |
-| ================================================================================|
-|*Note: This script works best on games that were directly installed to microSD   |
-| card. If the game was installed to internal storage and moved to microSD card   |
-| later via Steam's \"Move install folder...\" option, Valve has already created  |
-| a compatibility data directory on the microSD card for it. However, Valve has   |
-| NOT created a pre-cached shader data directory on the microSD card for it. In   |
-| that case, the right thing to do is to skip the option to move compatibility    |
-| data files, and only move the pre-cached shader files to the microSD card.      |
-| This behavior may change in later SteamOS updates, so keep that in mind.        |
-\---------------------------------------------------------------------------------/
+/----------------------------------------------------------------------------------------------------------------------\
+| This shell script will move a game's internal compatibility and pre-cached shader data to the microSD card slot or   |
+| back to internal storage. Steam will continue to access and update those files as if they were located internally.   |
+| Performance may see a slight decline when moving to the microSD card based on card storage access speed limitations. |
+| A2 Cards are recommended for best performance.                                                                       |
+| Please obtain the game's Steam App ID before running this script. Do not proceed without the game's Steam App ID. It |
+| can be obtained from the Updates pane within its Properties window. Do not confuse the App ID with the Build ID;     |
+| they're different. The Build ID will NOT work.                                                                       |
+| =====================================================================================================================|
+| This script works best on games that were directly installed to microSD card. If the game was initially installed to |
+| internal storage and moved to microSD card later via Steam's "Move install folder..." option, Valve has already      |
+| created a compatibility data directory on the microSD card for it. However, Valve has NOT created a pre-cached shader|
+| data directory on the microSD card for it. In that case, the right thing to do is to skip the option to move the     |
+| compatibility data files, and only move the pre-cached shader files to the microSD card. This behavior may change in |
+| later SteamOS updates, so please keep that in mind.                                                                  |
+\----------------------------------------------------------------------------------------------------------------------/
 
 HEREDOCINTRO
 
@@ -207,6 +204,38 @@ else
   else
     echo
     echo "There is no compatibility data directory for App ID $nSteamId."
+    echo "Do you wish to create one now on the MicroSD card and create a link for it on the Internal Storage?"
+    select yn in "Yes" "No"; do
+      case $yn in
+         Yes ) ## This path will create the directory in the microSD card and then create the link. No data will be moved (it doesn't exist)
+           echo
+           echo "Creating compatibility data directory on MicroSD card for AppID $nSteamId."
+           nCount=0
+           while [[ $nCount -lt 3 ]]; do
+            printf .
+            sleep 1s
+            ((nCount++))
+           done
+           cd $sCardCompatDataRoot
+           /usr/bin/mkdir $nSteamId
+           sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
+           cd $sLocalCompatDataRoot
+           echo
+           echo "Creating symbolic link for MicroSD card compatibility directory on Internal Storage."
+           /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
+           echo
+           echo "Returning the value of the resulting compatibility data symbolic link below:"
+           echo
+           sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+           echo "$sTargetCompatDataPath"
+           echo
+           break;;
+         No ) ## This path won't create the link
+           echo "Compatibility data directory will not be created on MicroSD card for Steam App ID $nSteamId."
+           echo "No symbolic link will be created on internal storage for compatibility data either."
+           break;;
+      esac
+    done
     echo "Moving on to verify for shader cache files."
     sleep 3s
     echo
@@ -340,7 +369,38 @@ else
    done
   else
     echo
-    echo "No shader cache files found on for App ID $nSteamId. Nothing to do."
-  fi
+    echo "No shader cache files found on for App ID $nSteamId."
+    echo "Do you wish to create one now on the MicroSD card and create a link for it on the Internal Storage?"
+    select yn in "Yes" "No"; do
+      case $yn in
+        Yes ) ## This path will create the directory in the MicroSD card and then create the link. No data will be moved (it doesn't exist)
+          echo "Creating pre-cached shader data directory on MicroSD card for AppID $nSteamId."
+          nCount=0
+          while [[ $nCount -lt 3 ]]; do
+            printf .
+            sleep 1s
+            ((nCount++))
+          done
+          cd $sCardShaderCacheRoot
+          /usr/bin/mkdir $nSteamId
+          sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
+          cd $sCardShaderCacheRoot
+          echo
+          echo "Creating symbolic link for MicroSD card pre-cached shader data directory on Internal Storage."
+          /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
+          echo
+          echo "Returning the value of the resulting pre-cached shader data symbolic link below:"
+          echo
+          sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+          echo "$sTargetShaderCachePath"
+          echo
+          break;;
+        No ) ## This path won't create the link.
+          echo "Pre-cached shader directory will not be created on MicroSD card for AppID $nSteamId."
+          echo "No symbolic link will be created on internal storage for pre-cached shaders."
+          break;;
+      esac
+    done
+   fi
 fi
 exit 0
