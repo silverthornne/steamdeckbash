@@ -12,13 +12,14 @@
 ################### Oh YEA! Important stuff:                                                                                    ################
 ###################                                                                                                             ################
 ################### This script is provided as-is. No guarantees are written or implied. You may freely use this script but may ################
-################### not distribute it or include it on any custom distribution. Do feel free to fork it and modify it for your  ################
-################### own use though. The reality is that I don't really have the power to stop you from distributing this script ################
-################### against my wishes, but if you do so you will be cursed in such a way that, from the date that you choose to ################
-################### breach these conditions and distribute the script without permission, you'll feel an intense craving for    ################
-################### Oreo cookies. Every time you sit down to eat them you will get a nice bottle of milk, dunk them in it, and  ################
-################### egads! NO FILLING ON EVERY THIRD COOKIE! That's your curse! Intense craving for Oreos but every third one   ################
-################### will have no filling! So don't distribute this script without my permission. You've been warned.            ################
+################### not distribute unless you keep this message in your distribution. Feel free to fork it and modify it for    ################
+################### your own use. The reality is that I don't really have the power to stop you from distributing this script   ################
+################### and remove this message, but if you do so you will be cursed in such a way that, from the date that you     ################
+################### choose to breach this condition, you'll feel an intense craving for Oreo cookies. Every time you sit down   ################
+################### to eat them you will get a nice bottle of milk, dunk them in it, and egads!                                 ################
+################### NO FILLING ON EVERY THIRD COOKIE! That's your curse! Intense craving for Oreos but every third one will     ################
+################### have no filling! You've been warned.                                                                        ################
+################### Oh! And I'm not affiliated with Nabisco in any way, shape or form. I just find that curse amusing :)        ################
 ## moveCacheLocation.sh ########################################################################################################################
 
 
