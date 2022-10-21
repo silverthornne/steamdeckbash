@@ -310,7 +310,7 @@ else
             echo
             cd "$sLocalShaderCacheRoot"
             /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
-            sCardShaderCachePath="$sCardCompatDataRoot/$nSteamId"
+            sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
             /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
             cd "$sLocalShaderCacheRoot"
             echo "Returning the value of the shader cache symbolic link below:"
