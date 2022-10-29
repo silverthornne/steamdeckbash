@@ -20,3 +20,9 @@ More information in the following locations:
 I consider this script to be feature complete at this point, even if there is a scenario that it's not handling at this time:
 
 If a user used the Move install location feature from Steam to move a game's data from internal storage to the MicroSD card, SteamOS created the compatibility directory on the MicroSD card on its own. However, there's still a compatibility directory on internal storage. I haven't spent enough time verifying how this behaviour works, so the script does not support this scenario. I plan to expand it later on to handle this kind of situation, but the current version does not.
+
+# Work in Progress:
+
+### Building a list of games installed and selecting from them
+
+Shortly after sharing the script on [/r/SteamDeck](https://www.reddit.com/r/SteamDeck/), user *Z_a_l_g_o* shared a way to obtain a list of the games in a user's Steam Deck and their App IDs so it's possible to select from them instead of having to directly input the App ID in the script itself. I will build a new version of the script that does that as it will be more user-friendly. I won't replace the old script though because some power users may prefer to type in the App ID, depending on how long it takes to build that App ID list.
