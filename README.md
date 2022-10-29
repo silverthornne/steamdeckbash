@@ -15,7 +15,7 @@ More information in the following locations:
 
 [Rumble Video Overview and Explanation](https://rumble.com/v1qe7qv-use-a-bash-script-to-save-internal-storage-space-on-your-steam-deck.html?mref=1j31yr&mc=3pdme)
 
-### Final word on moveCacheLocation script
+### Final word on moveCacheLocation script:
 
 I consider this script to be feature complete at this point, even if there is a scenario that it's not handling at this time:
 
