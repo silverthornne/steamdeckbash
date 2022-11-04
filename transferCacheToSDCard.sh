@@ -97,12 +97,16 @@ menu_from_array ()
   then
     sSelectedGame=$(echo "$nGame" | grep -oP '(?<=-).*' | sed -e 's/\_/\ /g')
     #echo $nGame
-    nAppId=$(echo "$nGame" | egrep -o '^[^-]+')
+    nSteamId=$(echo "$nGame" | egrep -o '^[^-]+')
     #echo $nAppId
     echo "-------------------------------------------------------------------------------------------------------------"
     echo "The selected game from this Steam Deck is \"$sSelectedGame.\""; echo
-    echo "The App ID for the selected game is $nAppId."; echo
-    echo "Do you wish to move the data for \"$sSelectedGame,\" a game with an App ID of $nAppId?"; echo
+    echo "The App ID for the selected game is $nSteamId."; echo
+    echo "Do you wish to move the data for \"$sSelectedGame,\" a game with an App ID of $nSteamId?"; echo
+    sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
+    sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
+    sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
+    sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
     select yn in "Yes" "No"; do
       case $yn in
         Yes )
@@ -246,6 +250,9 @@ menu_from_array ()
               echo "Moving on to verify for shader cache files."
               sleep 3s
               echo
+            else
+              echo
+              echo "There is no compatibility data for $nGame. Moving on to shader pre-cache data."
             fi
             ############ Done with Compatibility Data.
             ############ Shader Cache from this line on.
@@ -379,7 +386,11 @@ menu_from_array ()
                     break;;
                esac
              done
-             fi
+            else
+              echo
+              echo "There is no shader pre-cache data for $nGame. Exiting script."
+              exit 0
+            fi
           break;;
 #########################################################################################################################
         No )
