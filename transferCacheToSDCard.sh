@@ -210,6 +210,10 @@ menu_from_array ()
                                   if [[ $nCount -eq 3 ]]; then
                                     printf .
                                     cd "$sLocalCompatDataRoot"
+                                    echo "------------------------------"
+                                    echo "Displaying working path."
+                                    /usr/bin/pwd
+                                    echo "------------------------------"
                                     /usr/bin/mv $nSteamId "$sCardCompatDataRoot"
                                     sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
                                     /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
@@ -290,6 +294,11 @@ menu_from_array ()
                         if [[ $nCount -eq 3 ]]; then
                           printf .
                           cd "$sLocalShaderCacheRoot"
+                          cd "$sLocalCompatDataRoot"
+                          echo "------------------------------"
+                          echo "Displaying working path."
+                          /usr/bin/pwd
+                          echo "------------------------------"
                           /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
                           sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
                           /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
@@ -305,6 +314,7 @@ menu_from_array ()
                       sleep 3s
                       nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
                       echo "Micro SD card has $nCardFreeReadable storage space left after moving shader cache to it."
+                      exit 0
                   else
                      nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
                      nShaderCacheSizeReadable=$(du -h $sLocalShaderCachePath -d 0 | cut -f1)
@@ -368,6 +378,7 @@ menu_from_array ()
                       sleep 3s
                       nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
                       echo "Internal storage has $nInternalFreeReadable available after moving the selected shader cache files back to it."
+                      exit 0
                     else
                       nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
                       nShaderCacheSizeReadable=$(du -h "$sCardShaderCachePath" -d 0 | cut -f1)
@@ -376,6 +387,7 @@ menu_from_array ()
                       echo "The shader cache data directory requires $nShaderCacheSizeReadable of space available."
                       echo "That's not enough space to move the selected shader cache data from the Micro SD card back to Internal Storage."
                       echo
+                      exit 0
                     fi
                   fi
                   break;;
@@ -413,32 +425,3 @@ echo
 ##echo ${aGameList[@]}
 menu_from_array "${aGameList[@]}"
 
-#aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -not \( -path "$sCardPath"/lost+found -prune \) -name steamapps -printf "%h/%f/*appmanifest* ") | sed -e 's/^.*_//;s/name//;s/.acf://;s/\t\{1,3\}/-/g'))
-
-#echo ${aGameList[@]}
-#echo
-
-#for i in "${aGameList[@]}"
-#do
-   # do whatever on "$i" here
-#   printf "$i\n"
-#done
-
-#echo
-#echo "Select the game to move its compatibility data and shader pre-cache data to MicroSD Card:"
-#select nGame in "${aGameList[@]}"; do
-#  case $nGame in
-#    $nGame )
-#      echo "You selected ${aGameList[$nGame]}"
-#      break;;
-#  esac
-#done
-
-
-
-
-
-# Declare the array
-
-
-# Call the subroutine to create the menu
