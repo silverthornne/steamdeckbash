@@ -206,6 +206,7 @@ menu_from_array ()
                                   sleep 1s
                                   ((nCount++))
                                 done
+                                cd $sLocalCompatDataRoot
                                 /usr/bin/mv $nSteamId "$sCardCompatDataRoot"
                                 sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
                                 /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
