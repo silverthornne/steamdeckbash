@@ -144,15 +144,12 @@ menu_from_array ()
                              while [[ $nCount -lt 5 ]]; do
                                printf .
                                sleep 1s
-                               if [[ $nCount -eq 3 ]]; then
-                                 printf .
-                                 cd $sLocalCompatDataRoot
-                                 /usr/bin/unlink $nSteamId
-                                 cd $sCardCompatDataRoot
-                                 /usr/bin/mv $nSteamId "$sLocalCompatDataRoot"
-                               fi
                                ((nCount++))
                              done
+                             cd $sLocalCompatDataRoot
+                             /usr/bin/unlink $nSteamId
+                             cd $sCardCompatDataRoot
+                             /usr/bin/mv $nSteamId "$sLocalCompatDataRoot"
                              echo
                              echo "Returning the value of the new compatibility data directory below:"
                              cd $sLocalCompatDataRoot
@@ -207,19 +204,11 @@ menu_from_array ()
                                 while [[ $nCount -lt 5 ]]; do
                                   printf .
                                   sleep 1s
-                                  if [[ $nCount -eq 3 ]]; then
-                                    printf .
-                                    cd "$sLocalCompatDataRoot"
-                                    echo "------------------------------"
-                                    echo "Displaying working path."
-                                    /usr/bin/pwd
-                                    echo "------------------------------"
-                                    /usr/bin/mv $nSteamId "$sCardCompatDataRoot"
-                                    sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
-                                    /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
-                                  fi
                                   ((nCount++))
                                 done
+                                /usr/bin/mv $nSteamId "$sCardCompatDataRoot"
+                                sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
+                                /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
                                 cd "$sLocalCompatDataRoot"
                                 echo
                                 echo "Returning the value of the resulting compatibility data symbolic link below:"
@@ -291,19 +280,11 @@ menu_from_array ()
                       while [[ $nCount -lt 5 ]]; do
                         printf .
                         sleep 1s
-                        if [[ $nCount -eq 3 ]]; then
-                          printf .
-                          cd "$sLocalShaderCacheRoot"
-                          echo "------------------------------"
-                          echo "Displaying working path."
-                          /usr/bin/pwd
-                          echo "------------------------------"
-                          /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
-                          sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
-                          /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
-                        fi
                         ((nCount++))
                       done
+                      /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
+                      sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
+                      /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
                       cd "$sLocalShaderCacheRoot"
                       echo "Returning the value of the shader cache symbolic link below:"
                       echo
@@ -359,15 +340,12 @@ menu_from_array ()
                       while [[ $nCount -lt 5 ]]; do
                         printf .
                         sleep 1s
-                        if [[ $nCount -eq 3 ]]; then
-                          printf .
-                          cd "$sLocalShaderCacheRoot"
-                          /usr/bin/unlink $nSteamId
-                          cd "$sCardShaderCacheRoot"
-                          /usr/bin/mv $nSteamId "$sLocalShaderCacheRoot"
-                        fi
                         ((nCount++))
                       done
+                      cd "$sLocalShaderCacheRoot"
+                      /usr/bin/unlink $nSteamId
+                      cd "$sCardShaderCacheRoot"
+                      /usr/bin/mv $nSteamId "$sLocalShaderCacheRoot"
                       echo
                       echo "Returning the value of the new shader cache directory below:"
                       cd "$sLocalShaderCacheRoot"
