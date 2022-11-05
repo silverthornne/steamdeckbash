@@ -168,6 +168,9 @@ menu_from_array ()
                              echo "That's not enough space to move the selected compatibility data from Micro SD card back to Internal Storage."
                              echo
                            fi
+                         else
+                           echo "Warning: The current MicroSD card does not contain this title's compatibility data. No data to move back."
+                           exit 0
                          fi
                        break;;
                       No ) ## This path will not move the compatibility data directory back to internal storage
@@ -252,68 +255,8 @@ menu_from_array ()
             ############ Shader Cache from this line on.
             ############ Creepy crawlies are sure to be around.
             ############ LET'S DO THEEEEEEZZZZZZ
-            if [[ -d "$sLocalShaderCachePath" ]]; then
+            if [[ -h "$sLocalShaderCachePath" ]]; then
               ## Code that validates whether the internal shader cache data path exists:"
-              echo
-              echo "There is an internal storage shader cache directory for App ID $nSteamId."
-              echo "A symbolic link will be created to maintain compatibility after moving the shader cache directory."
-              echo "Do you wish to proceed?"
-              select yn in "Yes" "No"; do
-                case $yn in
-                  Yes ) ## This path will move the shader cache directory to micro SD card:
-                    #### Need to add check for storage space
-                    echo
-                    echo "Verifying available space on Micro SD card and size of shader cache directory."
-                    nCount=0
-                    while [[ $nCount -lt 5 ]]; do
-                      printf .
-                      sleep 1s
-                      ((nCount++))
-                    done
-                    nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
-                    nShaderCacheSize=$(du $sLocalShaderCachePath -d 0 | cut -f1)
-                    if [[ $nCardFreeAbsolute -gt $nShaderCacheSize ]]; then
-                      echo
-                      echo "Moving shader cache directory to micro SD card, please wait."
-                      echo "Do not, under any circumstance, remove the micro SD card while this operation runs."
-                      echo
-                      nCount=0
-                      while [[ $nCount -lt 5 ]]; do
-                        printf .
-                        sleep 1s
-                        ((nCount++))
-                      done
-                      cd "$sLocalShaderCacheRoot"
-                      /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
-                      sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
-                      /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
-                      cd "$sLocalShaderCacheRoot"
-                      echo "Returning the value of the shader cache symbolic link below:"
-                      echo
-                      sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
-                      echo "$sTargetShaderCachePath"
-                      echo
-                      sleep 3s
-                      nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
-                      echo "Micro SD card has $nCardFreeReadable storage space left after moving shader cache to it."
-                      exit 0
-                  else
-                     nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
-                     nShaderCacheSizeReadable=$(du -h $sLocalShaderCachePath -d 0 | cut -f1)
-                     echo
-                     echo "There is not enough free space on the Micro SD card to move the shader cache directory to it."
-                     echo "The Micro SD card needs $nShaderCacheSizeReadable free, but it only has $nCardFreeReadable available."
-                     echo
-                  fi
-                    break;;
-                  No ) ## This path will not move the shader cache files and the script will exit.
-                    echo
-                    echo "Shader cache files won't be moved to micro SD card. Exiting script."
-                    sleep 3s
-                    break;;
-                esac
-              done
-            elif [[ -L "$sLocalShaderCachePath" ]]; then
               echo
               ###### --------Handling when the data has already been moved to micro SD card.
               echo "The shader cache for App ID $nSteamId has already been moved to a micro SD card."
@@ -332,51 +275,114 @@ menu_from_array ()
                         sleep 1s
                         ((nCount++))
                       done
-                    nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
-                    nShaderCacheSize=$(du $sCardShaderCachePath -d 0 | cut -f1)
-                    if [[ $nInternalFreeAbsolute -gt $nShaderCacheSize ]]; then
-                      echo
-                      echo "Moving shader cache data from Micro SD card back to Internal Storage!"
-                      echo
-                      nCount=0
-                      while [[ $nCount -lt 5 ]]; do
-                        printf .
-                        sleep 1s
-                        ((nCount++))
-                      done
-                      cd "$sLocalShaderCacheRoot"
-                      /usr/bin/unlink $nSteamId
-                      cd "$sCardShaderCacheRoot"
-                      /usr/bin/mv $nSteamId "$sLocalShaderCacheRoot"
-                      echo
-                      echo "Returning the value of the new shader cache directory below:"
-                      cd "$sLocalShaderCacheRoot"
-                      sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
-                      echo "$sTargetShaderCachePath"
-                      echo
-                      sleep 3s
-                      nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
-                      echo "Internal storage has $nInternalFreeReadable available after moving the selected shader cache files back to it."
-                      exit 0
+                      nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
+                      nShaderCacheSize=$(du $sCardShaderCachePath -d 0 | cut -f1)
+                      if [[ $nInternalFreeAbsolute -gt $nShaderCacheSize ]]; then
+                        echo
+                        echo "Moving shader cache data from Micro SD card back to Internal Storage!"
+                        echo
+                        nCount=0
+                        while [[ $nCount -lt 5 ]]; do
+                          printf .
+                          sleep 1s
+                          ((nCount++))
+                        done
+                        cd "$sLocalShaderCacheRoot"
+                        /usr/bin/unlink $nSteamId
+                        cd "$sCardShaderCacheRoot"
+                        /usr/bin/mv $nSteamId "$sLocalShaderCacheRoot"
+                        echo
+                        echo "Returning the value of the new shader cache directory below:"
+                        cd "$sLocalShaderCacheRoot"
+                        sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+                        echo "$sTargetShaderCachePath"
+                        echo
+                        sleep 3s
+                        nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
+                        echo "Internal storage has $nInternalFreeReadable available after moving the selected shader cache files back to it."
+                        exit 0
+                      else
+                        nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
+                        nShaderCacheSizeReadable=$(du -h "$sCardShaderCachePath" -d 0 | cut -f1)
+                        echo
+                        echo "Internal storage only has $nInternalFreeReadable space left."
+                        echo "The shader cache data directory requires $nShaderCacheSizeReadable of space available."
+                        echo "That's not enough space to move the selected shader cache data from the Micro SD card back to Internal Storage."
+                        echo
+                        exit 0
+                      fi
                     else
-                      nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
-                      nShaderCacheSizeReadable=$(du -h "$sCardShaderCachePath" -d 0 | cut -f1)
-                      echo
-                      echo "Internal storage only has $nInternalFreeReadable space left."
-                      echo "The shader cache data directory requires $nShaderCacheSizeReadable of space available."
-                      echo "That's not enough space to move the selected shader cache data from the Micro SD card back to Internal Storage."
-                      echo
-                      exit 0
+                      echo "Warning: The current MicroSD card does not contain this title's shader pre-cache data. No data to move back."
+                      exit 1
                     fi
-                  fi
                   break;;
                   No ) ## This path will not move the shader cache directory to internal storage.
                     echo
                     echo "Shader cache data won't be moved to Internal Storage as selected. Exiting script."
                     exit 0
                     break;;
-               esac
-             done
+                esac
+              done
+            elif [[ -d "$sLocalShaderCachePath" ]]; then
+              echo
+              echo "There is an internal storage shader cache directory for App ID $nSteamId."
+              echo "A symbolic link will be created to maintain compatibility after moving the shader cache directory."
+              echo "Do you wish to proceed?"
+              select yn in "Yes" "No"; do
+                case $yn in
+                Yes ) ## This path will move the shader cache directory to micro SD card:
+                  #### Need to add check for storage space
+                  echo
+                  echo "Verifying available space on Micro SD card and size of shader cache directory."
+                  nCount=0
+                  while [[ $nCount -lt 5 ]]; do
+                    printf .
+                    sleep 1s
+                    ((nCount++))
+                  done
+                  nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
+                  nShaderCacheSize=$(du $sLocalShaderCachePath -d 0 | cut -f1)
+                  if [[ $nCardFreeAbsolute -gt $nShaderCacheSize ]]; then
+                    echo
+                    echo "Moving shader cache directory to micro SD card, please wait."
+                    echo "Do not, under any circumstance, remove the micro SD card while this operation runs."
+                    echo
+                    nCount=0
+                    while [[ $nCount -lt 5 ]]; do
+                      printf .
+                      sleep 1s
+                      ((nCount++))
+                    done
+                    cd "$sLocalShaderCacheRoot"
+                    /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
+                    sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
+                    /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
+                    cd "$sLocalShaderCacheRoot"
+                    echo "Returning the value of the shader cache symbolic link below:"
+                    echo
+                    sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+                    echo "$sTargetShaderCachePath"
+                    echo
+                    sleep 3s
+                    nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
+                    echo "Micro SD card has $nCardFreeReadable storage space left after moving shader cache to it."
+                    exit 0
+                  else
+                    nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
+                    nShaderCacheSizeReadable=$(du -h $sLocalShaderCachePath -d 0 | cut -f1)
+                    echo
+                    echo "There is not enough free space on the Micro SD card to move the shader cache directory to it."
+                    echo "The Micro SD card needs $nShaderCacheSizeReadable free, but it only has $nCardFreeReadable available."
+                    echo
+                  fi
+                  break;;
+                No ) ## This path will not move the shader cache files and the script will exit.
+                  echo
+                  echo "Shader cache files won't be moved to micro SD card. Exiting script."
+                  sleep 3s
+                  break;;
+                esac
+              done
             else
               echo
               echo "There is no shader pre-cache data for $nGame. Exiting script."
