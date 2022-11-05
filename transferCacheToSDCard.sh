@@ -294,7 +294,6 @@ menu_from_array ()
                         if [[ $nCount -eq 3 ]]; then
                           printf .
                           cd "$sLocalShaderCacheRoot"
-                          cd "$sLocalCompatDataRoot"
                           echo "------------------------------"
                           echo "Displaying working path."
                           /usr/bin/pwd

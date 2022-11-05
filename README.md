@@ -25,6 +25,8 @@ If a user used the Move install location feature from Steam to move a game's dat
 
 ### Building a list of games installed and selecting from them
 
+### IMPORTANT: DO NOT USE transferCacheToSDCard.sh YET. IT HAS SOME BUGS THAT I AM IRONING OUT.
+
 Based on a suggestion and some help from [/r/SteamDeck](https://www.reddit.com/r/SteamDeck/), user *Z_a_l_g_o*, this new script looks into the app manifest files in the MicroSD card and obtains information from them to display a menu with all games installed in the present MicroSD card.
 
 This should make this script safer as the user won't have to type in the App ID; it will use the App IDs located from the data on the app manifest files. I haven't tested it yet though, so use it at your own risk only! This version also lacks the function to create a symbolic link for a game that isn't present in the MicroSD card. As it works with the games currently present in it and doesn't allow a user to type in the App ID themselves, it can't offer to create a symbolic link for a game whose information isn't present in the app manifest files.
