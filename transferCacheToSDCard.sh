@@ -282,6 +282,7 @@ menu_from_array ()
                         sleep 1s
                         ((nCount++))
                       done
+                      cd "$sLocalShaderCacheRoot"
                       /usr/bin/mv $nSteamId "$sCardShaderCacheRoot"
                       sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
                       /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
