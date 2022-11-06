@@ -1,6 +1,6 @@
 #!/bin/bash
 
-###################################### SCRIPT VERSION: 0.75 - UNTESTED; DON'T USE YET!!! #######################################################
+################################## SCRIPT VERSION: 0.95 - UNDER TEST; USE AT YOUR OWN RISK!!! ##################################################
 ####################################################################################################################### # moveCacheLocation.sh##
 ###################                           Code by Antonio Rodriguez Negron   |   silverthornne                               ###############
 ################### This is a script to move the shadercache and compatdata directories for a specified title to the SD card from the  #########
@@ -102,7 +102,7 @@ menu_from_array ()
     echo "-------------------------------------------------------------------------------------------------------------"
     echo "The selected game from this Steam Deck is \"$sSelectedGame.\""; echo
     echo "The App ID for the selected game is $nSteamId."; echo
-    echo "Do you wish to move the data for \"$sSelectedGame,\" a game with an App ID of $nSteamId?"; echo
+    echo "Do you wish with the selecteion of \"$sSelectedGame,\" a game with an App ID of $nSteamId?"; echo
     sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
     sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
     sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
