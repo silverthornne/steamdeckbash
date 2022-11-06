@@ -320,7 +320,6 @@ menu_from_array ()
                     echo
                     echo "Shader cache data won't be moved to Internal Storage as selected. Exiting script."
                     exit 0
-                    break;;
                 esac
               done
             elif [[ -d "$sLocalShaderCachePath" ]]; then
@@ -380,7 +379,7 @@ menu_from_array ()
                   echo
                   echo "Shader cache files won't be moved to micro SD card. Exiting script."
                   sleep 3s
-                  break;;
+                  exit 0
                 esac
               done
             else
