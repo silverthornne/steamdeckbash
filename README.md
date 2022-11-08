@@ -25,13 +25,13 @@ If a user used the Move install location feature from Steam to move a game's dat
 
 ### Building a list of games installed and selecting from them
 
-### IMPORTANT: DO NOT USE transferCacheToSDCard.sh YET. IT HAS SOME BUGS THAT I AM IRONING OUT.
-
 Based on a suggestion and some help from [/r/SteamDeck](https://www.reddit.com/r/SteamDeck/), user *Z_a_l_g_o*, this new script looks into the app manifest files in the MicroSD card and obtains information from them to display a menu with all games installed in the present MicroSD card.
 
 This should make this script safer as the user won't have to type in the App ID; it will use the App IDs located from the data on the app manifest files. I haven't tested it yet though, so use it at your own risk only! This version also lacks the function to create a symbolic link for a game that isn't present in the MicroSD card. As it works with the games currently present in it and doesn't allow a user to type in the App ID themselves, it can't offer to create a symbolic link for a game whose information isn't present in the app manifest files.
 
 Other than those notes, the end result is the same: if the game has its compatibility and shader pre-cache files on Internal storage, it will move them to MicroSD card and create a symbolic link. If there is already a symbolic link present, it will remove the symbolic link and move the files back from MicroSD card to internal storage. Don't use it on a game that was not directly installed to the MicroSD card; I still haven't worked on the scenario of a game that was moved to MicroSD card via Steam's "Move install location" function.
+
+This script also has logic to handle when the Steam Deck's internal storage and the MicroSD card both have directories for the compatibility and shader pre-cache data. The data on the MicroSD card will be prioritized and the data on internal storage will be deleted.
 
 ### A Note on the Menu:
 
