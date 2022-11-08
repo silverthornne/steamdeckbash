@@ -1,6 +1,6 @@
 #!/bin/bash
 
-################################## SCRIPT VERSION: 0.95 - UNDER TEST; USE AT YOUR OWN RISK!!! ##################################################
+################################## SCRIPT VERSION: 0.99 - UNDER TEST; USE AT YOUR OWN RISK!!! ##################################################
 ####################################################################################################################### # moveCacheLocation.sh##
 ###################                           Code by Antonio Rodriguez Negron   |   silverthornne                               ###############
 ################### This is a script to move the shadercache and compatdata directories for a specified title to the SD card from the  #########
@@ -86,7 +86,7 @@ done
 
 #aGameList=($(/usr/bin/grep -el name $(find "$sCardPath" -not \( -path "$sCardPath"/lost+found -prune \) -name steamapps -printf "%h/%f/*appmanifest* ") | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\t\{1,3\}/-/g' | awk -F'-' '{printf "%s-%s\n", $2,$1}' | sort -k1 | column -t -s- ))
 
-menu_from_array ()
+build_transfer_menu ()
 {
   echo "This operation will move compatibility and shader pre-cache data from Internal storage to MicroSD card or back if it's already been moved."
   echo "Select a game to run the operation on:"
@@ -101,7 +101,7 @@ menu_from_array ()
       echo "-------------------------------------------------------------------------------------------------------------"
       echo "The selected game from this Steam Deck is \"$sSelectedGame.\""; echo
       echo "The App ID for the selected game is $nSteamId."; echo
-      echo "Do you wish with the selecteion of \"$sSelectedGame,\" a game with an App ID of $nSteamId?"; echo
+      echo "Do you wish to proceed with the selection of \"$sSelectedGame,\" a game with an App ID of $nSteamId?"; echo
       sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
       sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
       sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
@@ -111,14 +111,22 @@ menu_from_array ()
           Yes )
             echo
             echo "Proceeding! Let's go!"
+            nCount=0
+            while [[ $nCount -lt 15 ]]; do
+              printf \>
+              sleep 0.05s
+              ((nCount++))
+            done
             echo
+            sleep 1s
             if [[ -h "$sLocalCompatDataPath" ]]; then
               ###### --------Handling when the data has already been moved to micro SD card.
               echo
-              echo "The compatibility data for App ID $nSteamId has already been moved to a micro SD card."
+              echo "The compatibility data for $sSelectedGame has already been moved to a micro SD card."
+              echo
               ############ Code to verify if the files are located in the current micro SD card and to ask to move them to internal storage goes here:
               sleep 1s
-              echo "Do you want to move the compatibility data back to internal storage if it is present in the micro SD card currently located in the Micro SD card slot?"
+              echo "Do you want to move $sSelectedGame's compatibility data back to internal storage if it is present in the micro SD card currently located in the Micro SD card slot?"
               sleep 1s
               echo
               select yn in "Yes" "No"; do
@@ -169,17 +177,61 @@ menu_from_array ()
                       fi
                     else
                       echo "Warning: The current MicroSD card does not contain this title's compatibility data. No data to move back."
+                      echo "The script will now exit."
+                      echo ">>>>>Goodbye!<<<<<"; echo
                       exit 0
                     fi
                     break;;
                   No ) ## This path will not move the compatibility data directory back to internal storage
                     echo
-                    echo "Compatibility data won't be moved to Internal Storage as selected. Moving on."
+                    echo "The compatibility data won't be moved to Internal Storage. Moving on to verify for pre-cached shader data."
                     sleep 3s
                     break;;
                 esac
               done
-            elif [[ -d "$sLocalCompatDataPath" ]]; then
+            elif [[ -d "$sLocalCompatDataPath" && -d "$sCardCompatDataPath" ]]; then
+              echo
+              echo "=================================================================================================================================="
+              echo "WARNING: We have found compatibility data directories for $sSelectedGame in both Internal Storage and the MicroSD card."
+              echo "This script will prioritize the compatibility data path in the MicroSD card as its aim is to save internal storage space."
+              echo "To achieve this, the internal storage compatibility data path will be DELETED."
+              echo "A symbolic link will be created in internal storage pointing to the compatibility data path in the MicroSD card."
+              echo "Do you really wish to proceed?"
+              echo
+              select yn in "Yes" "No"; do
+                case $yn in
+                  Yes )
+                    echo "Removing the Internal storage compatibility data directory for $sSelectedGame, as requested."
+                    nCount=0
+                    while [[ $nCount -lt 3 ]]; do
+                      printf .
+                      sleep 1s
+                      ((nCount++))
+                    done
+                    #### Commands to delete the existing compatibility data directory in internal storage and create new symbolic link.
+                    cd $sLocalCompatDataRoot
+                    /usr/bin/rm -rf $nSteamId
+                    /usr/bin/ln -s "$sCardCompatDataPath" $nSteamId
+                    echo
+                    echo "Returning the value of the resulting compatibility data symbolic link below:"
+                    echo
+                    sTargetCompatDataPath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+                    echo "$sTargetCompatDataPath"
+                    echo
+                    sleep 3s
+                    nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
+                    echo "Micro SD card has $nCardFreeReadable storage space left after moving compatibility data to it."
+                    echo
+                    break;;
+                  No )
+                    echo "You have chosen to keep both internal and MicroSD card compatibility data directories."
+                    echo "$sSelectedGame's data has not been transferred anywhere."
+                    echo "The script will now exit."
+                    echo ">>>>>Goodbye!<<<<<"; echo
+                    exit 0
+                esac
+              done
+            elif [[ -d "$sLocalCompatDataPath" && ! -h "$sLocalCompatDataPath" ]]; then
               echo
               echo "There is an internal storage compatibility data directory for App ID $nSteamId."
               echo "A symbolic link will be created to maintain compatibility after moving the compatibility data directory."
@@ -243,12 +295,12 @@ menu_from_array ()
                   break;;
                 esac
               done
-              echo "Moving on to verify for shader cache files."
+              echo; echo "Moving on to verify for shader cache files."
               sleep 3s
               echo
             else
               echo
-              echo "There is no compatibility data for $nGame. Moving on to shader pre-cache data."
+              echo "There is no compatibility data for $sSelectedGame. Moving on to shader pre-cache data."
             fi
           ############ Done with Compatibility Data.
               ############ Shader Cache from this line on.
@@ -258,7 +310,7 @@ menu_from_array ()
             ## Code that validates whether the internal shader cache data path exists:"
             echo
             ###### --------Handling when the data has already been moved to micro SD card.
-            echo "The shader cache for App ID $nSteamId has already been moved to a micro SD card."
+            echo "The shader cache for $sSelectedGame has already been moved to a micro SD card."; echo
             ############ Code to verify if the files are located in the current micro SD card and to ask to move them to internal storage goes here:
             sleep 1s
             echo "Do you want to move the shader cache back to internal storage if it is present in the micro SD card currently located in the micro SD card slot?"
@@ -299,6 +351,8 @@ menu_from_array ()
                       sleep 3s
                       nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
                       echo "Internal storage has $nInternalFreeReadable available after moving the selected shader cache files back to it."
+                      echo "Great success! The script will now exit."
+                      echo ">>>>>Goodbye!<<<<<"; echo
                       exit 0
                     else
                       nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
@@ -312,18 +366,66 @@ menu_from_array ()
                     fi
                     else
                       echo "Warning: The current MicroSD card does not contain this title's shader pre-cache data. No data to move back."
+                      echo "The script will now exit."
+                      echo ">>>>>Goodbye!<<<<<"; echo
                       exit 1
                   fi
                   break;;
                 No ) ## This path will not move the shader cache directory to internal storage.
                   echo
-                  echo "Shader cache data won't be moved to Internal Storage as selected. Exiting script."
+                  echo "Shader cache data won't be moved to Internal Storage as selected."
+                  echo "The script will now exit."
+                  echo ">>>>>Goodbye!<<<<<"; echo
                   exit 0
               esac
             done
-          elif [[ -d "$sLocalShaderCachePath" ]]; then
+          elif [[ -d "$sLocalShaderCachePath" && -d "$sCardShaderCachePath" ]]; then
+            ## The script will choose to do this if there is shader pre-cache data in both the internal storage and the MicroSD card.
+            ## I am not sure that this scenario will actually happen, as I haven't seen it happen myself, but nonetheless, I am handling it.
             echo
-            echo "There is an internal storage shader cache directory for App ID $nSteamId."
+            echo "=================================================================================================================================="
+            echo "WARNING: We have found shader pre-cache data directories for $sSelectedGame in both Internal Storage and the MicroSD card."
+            echo "This script will prioritize the shder pre-cache data path in the MicroSD card as its aim is to save internal storage space."
+            echo "To achieve this, the internal storage shader pre-cache data path will be DELETED."
+            echo "A symbolic link will be created in internal storage pointing to the shader pre-cache data path in the MicroSD card."
+            echo "Do you really wish to proceed?"
+            echo
+            select yn in "Yes" "No"; do
+              case $yn in
+                Yes )
+                  echo "Removing the Internal storage compatibility data directory for $sSelectedGame, as requested."
+                  nCount=0
+                  while [[ $nCount -lt 3 ]]; do
+                    printf .
+                    sleep 1s
+                    ((nCount++))
+                  done
+                  #### Commands to delete the existing shader cache data directory in internal storage and create new symbolic link.
+                  cd $sLocalShaderCacheRoot
+                  /usr/bin/rm -rf $nSteamId
+                  /usr/bin/ln -s "$sCardShaderCachePath" $nSteamId
+                  echo
+                  echo "Returning the value of the resulting compatibility data symbolic link below:"
+                  echo
+                  sTargetShaderCachePath=$(/usr/bin/pwd)\/$(ls -lrt | grep -Eo "$nSteamId".*)
+                  echo "$sTargetShaderCachePath"
+                  echo
+                  sleep 3s
+                  nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
+                  echo "Micro SD card has $nCardFreeReadable storage space left after moving shader pre-cache data to it."
+                  echo
+                  break;;
+                No )
+                  echo "You have chosen to keep both internal and MicroSD card shader pre-cache data directories."
+                  echo "$sSelectedGame's shader pre-cache data has not been transferred anywhere."
+                  echo "The script will now exit."
+                  echo ">>>>>Goodbye!<<<<<"; echo
+                  exit 0
+              esac
+            done
+          elif [[ -d "$sLocalShaderCachePath" && ! -h "$sLocalShaderCachePath" ]]; then
+            echo
+            echo "There is an internal storage shader cache directory for $sSelectedGame."
             echo "A symbolic link will be created to maintain compatibility after moving the shader cache directory."
             echo "Do you wish to proceed?"
             select yn in "Yes" "No"; do
@@ -364,6 +466,8 @@ menu_from_array ()
                     sleep 3s
                     nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
                     echo "Micro SD card has $nCardFreeReadable storage space left after moving shader cache to it."
+                    echo "Great success! The script will now exit."
+                    echo ">>>>>Goodbye!<<<<<"; echo
                     exit 0
                   else
                     nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
@@ -383,7 +487,9 @@ menu_from_array ()
             done
             else
               echo
-              echo "There is no shader pre-cache data for $nGame. Exiting script."
+              echo "There is no shader pre-cache data for $sSelectedGame. Exiting script."
+              echo "The script will now exit."
+              echo ">>>>>Goodbye!<<<<<"; echo
               exit 0
             fi
             break;;
@@ -402,7 +508,10 @@ menu_from_array ()
     fi
   done
 }
-aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -not \( -path "$sCardPath"/lost+found -prune \) -name steamapps -printf "%h/%f/*appmanifest* ") | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+#aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -not \( -path "$sCardPath"/lost+found -prune \) -name steamapps -printf "%h/%f/*appmanifest* ") | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+### ^ I decided to leave the old grep find combo in as a comment because it's a useful example of -prune to go back to.
+
+aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
 ##
-menu_from_array "${aGameList[@]}"
+build_transfer_menu "${aGameList[@]}"
 
