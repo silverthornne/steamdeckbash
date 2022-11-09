@@ -393,7 +393,7 @@ build_transfer_menu ()
             select yn in "Yes" "No"; do
               case $yn in
                 Yes )
-                  echo "Removing the Internal storage compatibility data directory for $sSelectedGame, as requested."
+                  echo "Removing the Internal shader pre-cache data directory for $sSelectedGame, as requested."
                   nCount=0
                   while [[ $nCount -lt 3 ]]; do
                     printf .
@@ -414,7 +414,7 @@ build_transfer_menu ()
                   nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
                   echo "Micro SD card has $nCardFreeReadable storage space left after moving shader pre-cache data to it."
                   echo
-                  break;;
+                  exit 0
                 No )
                   echo "You have chosen to keep both internal and MicroSD card shader pre-cache data directories."
                   echo "$sSelectedGame's shader pre-cache data has not been transferred anywhere."
