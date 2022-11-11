@@ -415,6 +415,7 @@ build_transfer_menu ()
                   echo "Micro SD card has $nCardFreeReadable storage space left after moving shader pre-cache data to it."
                   echo
                   exit 0
+                  break ;;
                 No )
                   echo "You have chosen to keep both internal and MicroSD card shader pre-cache data directories."
                   echo "$sSelectedGame's shader pre-cache data has not been transferred anywhere."
