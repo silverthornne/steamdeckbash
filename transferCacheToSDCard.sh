@@ -1,6 +1,6 @@
 #!/bin/bash
 
-################################## SCRIPT VERSION: 0.99 - UNDER TEST; USE AT YOUR OWN RISK!!! ##################################################
+########################################## SCRIPT VERSION: 1.0 - General Release!!! ############################################################
 ####################################################################################################################### # moveCacheLocation.sh##
 ###################                           Code by Antonio Rodriguez Negron   |   silverthornne                               ###############
 ################### This is a script to move the shadercache and compatdata directories for a specified title to the SD card from the  #########
@@ -27,7 +27,7 @@ cat << "HEREDOCINTRO"
 | This shell script will move a game's internal compatibility and pre-cached shader data to the microSD card slot or   |
 | back to internal storage. Steam will continue to access and update those files as if they were located internally.   |
 | Performance may see a slight decline when moving to the microSD card based on card storage access speed limitations. |
-| A2 Cards are recommended for best performance.                                                                       |                                                 |
+| A2 Cards are recommended for best performance.                                                                       |
 | =====================================================================================================================|
 | This script works best on games that were directly installed to microSD card. If the game was initially installed to |
 | internal storage and moved to microSD card later via Steam's "Move install folder..." option, Valve has already      |
