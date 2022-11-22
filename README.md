@@ -33,7 +33,13 @@ Other than those notes, the end result is the same: if the game has its compatib
 
 This script also has logic to handle when the Steam Deck's internal storage and the MicroSD card both have directories for the compatibility and shader pre-cache data. The data on the MicroSD card will be prioritized and the data on internal storage will be deleted.
 
-### A Note on the Menu:
+[Detailed explanation at Medium](https://medium.com/@arodznegron/easy-cache-data-transfer-script-for-steam-deck-4185bd312fb8)
+
+[YouTube Video Overview and Explanation](https://youtu.be/eN2jSfvatJo)
+
+[Rumble Video Overview and Explanation](https://rumble.com/v1wbfdw-an-improved-script-to-save-storage-space-on-steam-deck.html)
+
+### A Note on the Menu List:
 
 The menu isn't the most elegant one, but it works. It will display the App ID for the game, a dash, and the name of the game with underscores for the spaces. Something like "690790-Dirt_Rally_2"
 Fixing it so the items on the menu look better, as in turning the example above into just "Dirt Rally 2" on the menu is on the wish list, but it's very low priority.
