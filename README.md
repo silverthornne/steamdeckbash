@@ -43,3 +43,9 @@ This script also has logic to handle when the Steam Deck's internal storage and 
 
 The menu isn't the most elegant one, but it works. It will display the App ID for the game, a dash, and the name of the game with underscores for the spaces. Something like "690790-Dirt_Rally_2"
 Fixing it so the items on the menu look better, as in turning the example above into just "Dirt Rally 2" on the menu is on the wish list, but it's very low priority.
+
+## sendCacheToExternalStorage.sh
+
+This script is meant to handle issue #1. It will ask the user on which storage partition they want the script to look for games to move internal compatibility and shader pre-cache data to. It can be used to replace the transferCacheToSDCard script because the user can choose to run it on the MicroSD card location.
+
+However, if you just have a MicroSD card and don't use internal storage, you can skip the mount selection step by using the transferCacheToSDCard script, so that will be faster. Up to the user!

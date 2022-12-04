@@ -1,12 +1,24 @@
 #!/bin/bash
 
-########################################## SCRIPT VERSION: 1.0 - General Release!!! ############################################################
+########################################## SCRIPT VERSION: 0.85 - Use at your own Risk!!!! #####################################################
 ####################################################################################################################### # moveCacheLocation.sh##
 ###################                           Code by Antonio Rodriguez Negron   |   silverthornne                               ###############
-################### This is a script to move the shadercache and compatdata directories for a specified title to the SD card from the  #########
-################### internal storage in a Steam Deck (may work in other SteamOS devices, but I have only tested on Deck!).        ##############
+################### This is a script to move the shadercache and compatdata directories for a specified title to any external storage  #########
+################### from the internal storage in a Steam Deck (may work in other SteamOS devices, but I have only tested on Deck!).   ##########
 ################### Unlike the moveCacheLocation script, you don't need the game's Steam ID for it to work.                       ##############
-###################==============================================================================================================###############
+################### This script may also replace the transferCacheToSDCard script as you can choose the SD card from it. It does ###############
+################### add that extra step of choosing though. If you don't use an external storage such as a USB drive, it will be ###############
+################### easier to use the transferCacheToSDCard script as you won't have to make a selection at first.               ###############
+###################=============================================================================================================################
+###################                                                                                                             ################
+###################                                       IMPORTANT DISCLAIMER!!!                                               ################
+###################                                                                                                             ################
+################### Personally, I don't use external storage with my Deck, and I don't own one of those docks that allow the    ################
+################### use of an M2 drive. That means that I am not able to actually test this script on that kind of product.     ################
+################### I am hoping that this script can be tested with community help through Github so that I can confidently     ################
+################### upgrade it to a "1.0" version. All I can do is test the SD card implementation after all.                   ################
+###################                                                                                                             ################
+###################=============================================================================================================################
 ################### Oh YEA! Important stuff:                                                                                    ################
 ###################                                                                                                             ################
 ################### This script is provided as-is. No guarantees are written or implied. You may freely use this script but may ################
@@ -24,10 +36,13 @@
 cat << "HEREDOCINTRO"
 
 /----------------------------------------------------------------------------------------------------------------------\
-| This shell script will move a game's internal compatibility and pre-cached shader data to the microSD card slot or   |
-| back to internal storage. Steam will continue to access and update those files as if they were located internally.   |
-| Performance may see a slight decline when moving to the microSD card based on card storage access speed limitations. |
-| A2 Cards are recommended for best performance.                                                                       |
+| This shell script will move a game's internal compatibility and pre-cached shader data to the chosen mounted store   |
+| or back to internal storage. Steam will access and update those files as if they were on internal storage.           |
+| Performance may see a slight decline, depending on the storage specs, its access speed, and other limitations.       |
+|======================================================================================================================|
+| This script can be used in lieu of the transferCacheToSDCard script if you choose the mount location of the SD card  |
+| from the menu list. If you only mean to transfer to SD card and don't use external storage at all, you should stick  |
+| to the transferCacheToSDCard script though. Less steps, and less confusing if you don't use external storage.        |
 \----------------------------------------------------------------------------------------------------------------------/
 
 HEREDOCINTRO
@@ -37,8 +52,7 @@ sCardPath="/run/media/mmcblk0p1"
 ##### If the locations of the compatibility data and shader cache change in some future SteamOS update, just update these *Root variables to reflect the new location:
 sLocalCompatDataRoot="/home/deck/.local/share/Steam/steamapps/compatdata"
 sLocalShaderCacheRoot="/home/deck/.local/share/Steam/steamapps/shadercache"
-sCardCompatDataRoot="$sCardPath/steamapps/compatdata"
-sCardShaderCacheRoot="$sCardPath/steamapps/shadercache"
+
 #######################################################################################################################
 nInternalFreeAbsolute=$(df | grep "/home" | awk '{print $4}')
 nInternalFreeReadable=$(df -h | grep -n "/home" | awk '{print $4}')
@@ -73,26 +87,41 @@ select yn in "Yes" "No"; do
   esac
 done
 
+tTimeout=30
 
+timeout_monitor() {
+   sleep "$tTimeout"
+   echo "Timing out; couldn't find Steam games in $sCardPath"
+   echo "You may want to try another mount point."
+   echo "Yes, you may see a weird grep error if you repeat last command. Working on how to fix that; shouldn't be a serious issue."
+   kill "$1"
+}
 
-build_transfer_menu ()
-{
-  echo "This operation will move compatibility and shader pre-cache data from Internal storage to MicroSD card or back if it's already been moved."
+build_transfer_menu () {
+  echo "This operation will move compatibility and shader pre-cache data from Internal storage to the selected storage mount or back if it's already been moved."
   echo "Select a game to run the operation on:"
+  echo
+  #############################################################################
+  #############################################################################
+  echo "We are in testing phase right now. Please return the storage selected:"
+  echo "$sCardPath"
+  echo "Test done."
+  #############################################################################
+  #############################################################################
   echo
   select nGame; do
     # Check the selected menu item number
     if [ 1 -le "$REPLY" ] && [ "$REPLY" -le $# ]; then
       sSelectedGame=$(echo "$nGame" | grep -oP '(?<=-).*' | sed -e 's/\_/\ /g')
-      #echo $nGame
       nSteamId=$(echo "$nGame" | egrep -o '^[^-]+')
-      #echo $nAppId
       echo "-------------------------------------------------------------------------------------------------------------"
       echo "The selected game from this Steam Deck is \"$sSelectedGame.\""; echo
       echo "The App ID for the selected game is $nSteamId."; echo
       echo "Do you wish to proceed with the selection of \"$sSelectedGame,\" a game with an App ID of $nSteamId?"; echo
       sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
       sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
+      sCardCompatDataRoot="$sCardPath/steamapps/compatdata"
+      sCardShaderCacheRoot="$sCardPath/steamapps/shadercache"
       sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
       sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
       select yn in "Yes" "No"; do
@@ -498,12 +527,45 @@ build_transfer_menu ()
     fi
   done
 }
-#aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -not \( -path "$sCardPath"/lost+found -prune \) -name steamapps -printf "%h/%f/*appmanifest* ") | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
-### ^ I decided to leave the old grep find combo in as a comment because it's a useful example of -prune to go back to.
+#########################################################################################################################
+#########################################################################################################################
+## Let's build a menu list with the storage partitions on the device:
 
-##aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+build_storage_menu () {
+  echo "First, let's establish the storage location where we will search for games."
+  echo
+  select nStorage; do
+    #We are checking the selected menu item number.
+    if [ 1 -le "$REPLY" ] && [ "$REPLY" -le $# ]; then
+      nSelectedStorage=$(echo "$nStorage")
+      echo
+      echo "The selected storage is the one located at $nStorage"
+      echo "Is that correct?"
+      select yn in "Yes" "No"; do
+        case $yn in
+          Yes )
+            echo
+            echo "Proceeding. Let's go!"
+            sCardPath="$nSelectedStorage"
+            timeout_monitor "$$" &
+            Timeout_monitor_pid=$!
+            aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+            kill "$Timeout_monitor_pid"
+            build_transfer_menu "${aGameList[@]}"
+            break;;
+          No )
+            echo "Got it. Feel free to try again with another selection later on!"
+            echo "Goodbye."
+            exit 0
+            break;;
+        esac
+      done
+    fi
+  done
+}
 
-aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
-##
-build_transfer_menu "${aGameList[@]}"
+aStorageList=($(df -h | awk 'FNR >1 {print $6}' | grep -v 'etc\|var\|dev\|tmp'))
+build_storage_menu "${aStorageList[@]}"
+
+
 
