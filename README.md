@@ -46,6 +46,9 @@ Fixing it so the items on the menu look better, as in turning the example above 
 
 ## sendCacheToExternalStorage.sh
 
-This script is meant to handle issue #1. It will ask the user on which storage partition they want the script to look for games to move internal compatibility and shader pre-cache data to. It can be used to replace the transferCacheToSDCard script because the user can choose to run it on the MicroSD card location.
+### UPDATE 2022-12-08
+This external storage business is more complex than I expected as external storage can be used from within the Steam Deck desktop client and it will use a different directory for the games than the MicroSD card does from the Steam Gaming Mode. This makes the script to locate the games time out because it's looking in the wrong directory when it's an external storage drive that had the games installed in it from the desktop application. This also means that the directories that the script uses for shader and compatibility data will differ in their structure in that scenario, so please don't use this script yet as it will not work for external storage right now.
+
+This script is meant to handle issue #1. It will ask the user on which storage partition they want the script to look for games to move internal compatibility and shader pre-cache data to. It can be used to replace the transferCacheToSDCard script because the user can choose to run it on the MicroSD card location. This script will timeout when searching for games to handle the possibility that the user may choose a mount point without any Steam games in it. In the case that it times out, it may give a weird grep error precisely because it didn't find any games. 
 
 However, if you just have a MicroSD card and don't use internal storage, you can skip the mount selection step by using the transferCacheToSDCard script, so that will be faster. Up to the user!
