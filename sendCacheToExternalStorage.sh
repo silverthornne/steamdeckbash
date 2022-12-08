@@ -1,7 +1,11 @@
 #!/bin/bash
 
-########################################## SCRIPT VERSION: 0.85 - Use at your own Risk!!!! #####################################################
-####################################################################################################################### # moveCacheLocation.sh##
+########################################## SCRIPT VERSION: 0.85 - DO NOT UES YET - WIP!!!! #####################################################
+################################################################################################################ sendCacheToExternalStorage.sh##
+###################                                                                                                              ###############
+###################----------------------------------------------WORK IN PROGRESS------------------------------------------------###############
+###################-------------------------------------------NOT READY FOR PRIME TIME-------------------------------------------###############
+###################                                                                                                              ###############
 ###################                           Code by Antonio Rodriguez Negron   |   silverthornne                               ###############
 ################### This is a script to move the shadercache and compatdata directories for a specified title to any external storage  #########
 ################### from the internal storage in a Steam Deck (may work in other SteamOS devices, but I have only tested on Deck!).   ##########
@@ -30,12 +34,15 @@
 ################### NO FILLING ON EVERY THIRD COOKIE! That's your curse! Intense craving for Oreos but every third one will     ################
 ################### have no filling! You've been warned.                                                                        ################
 ################### Oh! And I'm not affiliated with Nabisco in any way, shape or form. I just find that curse amusing :)        ################
-## moveCacheLocation.sh ########################################################################################################################
+## sendCacheToExternalStorage.sh ###############################################################################################################
 
 
 cat << "HEREDOCINTRO"
 
 /----------------------------------------------------------------------------------------------------------------------\
+|                                                                                                                      |
+| !!!!!!!!!!!!!!!!!!!!!!!!!!!! STOP AND CTRL-C OUT OF THIS SCRIPT RIGHT NOW !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! |
+|                                                                                                                      |
 | This shell script will move a game's internal compatibility and pre-cached shader data to the chosen mounted store   |
 | or back to internal storage. Steam will access and update those files as if they were on internal storage.           |
 | Performance may see a slight decline, depending on the storage specs, its access speed, and other limitations.       |
@@ -43,6 +50,9 @@ cat << "HEREDOCINTRO"
 | This script can be used in lieu of the transferCacheToSDCard script if you choose the mount location of the SD card  |
 | from the menu list. If you only mean to transfer to SD card and don't use external storage at all, you should stick  |
 | to the transferCacheToSDCard script though. Less steps, and less confusing if you don't use external storage.        |
+|                                                                                                                      |
+| !!!!!!!!!!!!!!!!!!!!!!!!!! PLEASE CHECK THE README.MD FILE OUT FOR MORE INFO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! |
+|                                                                                                                      |
 \----------------------------------------------------------------------------------------------------------------------/
 
 HEREDOCINTRO
