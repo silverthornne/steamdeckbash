@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ########################################## SCRIPT VERSION: 1.0 - General Release!!! ############################################################
-####################################################################################################################### # moveCacheLocation.sh##
+##################################################################################################################### transferCacheToSDCard.sh##
 ###################                           Code by Antonio Rodriguez Negron   |   silverthornne                               ###############
-################### This is a script to move the shadercache and compatdata directories for a specified title to the SD card from the  #########
-################### internal storage in a Steam Deck (may work in other SteamOS devices, but I have only tested on Deck!).        ##############
-################### Unlike the moveCacheLocation script, you don't need the game's Steam ID for it to work.                       ##############
+################### This is a script to move the shadercache and compatdata directories for a specified title to the SD card from ##############
+################### the internal storage in a Steam Deck (may work in other SteamOS devices, but I have only tested on Deck!).   ###############
+################### Unlike the moveCacheLocation script, you don't need the game's Steam ID for it to work.                      ###############
 ###################==============================================================================================================###############
 ################### Oh YEA! Important stuff:                                                                                    ################
 ###################                                                                                                             ################
@@ -18,7 +18,7 @@
 ################### NO FILLING ON EVERY THIRD COOKIE! That's your curse! Intense craving for Oreos but every third one will     ################
 ################### have no filling! You've been warned.                                                                        ################
 ################### Oh! And I'm not affiliated with Nabisco in any way, shape or form. I just find that curse amusing :)        ################
-## moveCacheLocation.sh ########################################################################################################################
+## transferCacheToSDCard.sh ####################################################################################################################
 
 
 cat << "HEREDOCINTRO"
@@ -73,7 +73,12 @@ select yn in "Yes" "No"; do
   esac
 done
 
-
+timeout_monitor() {
+   sleep "$tTimeout"
+   echo "Timing out; couldn't find Steam games on your MicroSD card."
+   echo "Yes, you may see a grep error if you repeat last command. It's not a serious issue."
+   kill "$1"
+}
 
 build_transfer_menu ()
 {
@@ -502,8 +507,10 @@ build_transfer_menu ()
 ### ^ I decided to leave the old grep find combo in as a comment because it's a useful example of -prune to go back to.
 
 ##aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
-
+timeout_monitor "$$" &
+Timeout_monitor_pid=$!
 aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+kill "$Timeout_monitor_pid"
 ##
 build_transfer_menu "${aGameList[@]}"
 
