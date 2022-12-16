@@ -73,11 +73,15 @@ select yn in "Yes" "No"; do
   esac
 done
 
+tTimeout=30
+
 timeout_monitor() {
    sleep "$tTimeout"
    echo "Timing out; couldn't find Steam games on your MicroSD card."
-   echo "Yes, you may see a grep error if you repeat last command. It's not a serious issue."
+   echo
+   echo "--Yes, you may see a weird grep error. Working on how to fix that; shouldn't be a serious issue.--"
    kill "$1"
+   exit 1
 }
 
 build_transfer_menu ()
@@ -93,9 +97,9 @@ build_transfer_menu ()
       nSteamId=$(echo "$nGame" | egrep -o '^[^-]+')
       #echo $nAppId
       echo "-------------------------------------------------------------------------------------------------------------"
-      echo "The selected game from this Steam Deck is \"$sSelectedGame.\""; echo
+      echo "The selected game from this Steam Deck is $sSelectedGame."; echo
       echo "The App ID for the selected game is $nSteamId."; echo
-      echo "Do you wish to proceed with the selection of \"$sSelectedGame,\" a game with an App ID of $nSteamId?"; echo
+      echo "Do you wish to proceed with the selection of $sSelectedGame, a game with an App ID of $nSteamId?"; echo
       sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
       sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
       sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
