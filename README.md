@@ -47,8 +47,33 @@ Fixing it so the items on the menu look better, as in turning the example above 
 ## sendCacheToExternalStorage.sh
 
 ### UPDATE 2022-12-08
-This external storage business is more complex than I expected as external storage can be used from within the Steam Deck desktop client and it will use a different directory for the games than the MicroSD card does from the Steam Gaming Mode. This makes the script to locate the games time out because it's looking in the wrong directory when it's an external storage drive that had the games installed in it from the desktop application. This also means that the directories that the script uses for shader and compatibility data will differ in their structure in that scenario, so please don't use this script yet as it will not work for external storage right now.
+This external storage business is more complex than I expected as external storage can be used from within the Steam Deck desktop client and it will use a different directory for the games than the MicroSD card does from the Steam Gaming Mode. This may make the script to locate the games time out because it's looking in the wrong directory when it's an external storage drive. I have taken steps to fix this by changing the directory to follow the same pattern as with the desktop application (SteamLibrary instead of steamapps), but I need community help to test it because I don't use USB storage with my Deck.
 
 This script is meant to handle issue #1. It will ask the user on which storage partition they want the script to look for games to move internal compatibility and shader pre-cache data to. It can be used to replace the transferCacheToSDCard script because the user can choose to run it on the MicroSD card location. This script will timeout when searching for games to handle the possibility that the user may choose a mount point without any Steam games in it. In the case that it times out, it may give a weird grep error precisely because it didn't find any games. 
 
 However, if you just have a MicroSD card and don't use internal storage, you can skip the mount selection step by using the transferCacheToSDCard script, so that will be faster. Up to the user!
+
+## migrateFullCacheToExternalDrive.sh
+
+Script Features:
+
+1. MOVE compatibility data for ALL games with compatibility and pre-cached shader data in the selected storage from internal storage to the storage where the game is located.
+2. MOVE the shader pre-cache data for games in the selected storage from internal storage to the storage where the game is located.
+3. If there is compatibility data in both the internal storage and the selected external storage for that game, the script will DELETE the compatibility data in internal storage and create a symbolic link to the existing compatibility data in the selected external storage. External data is prioritized.
+4. If there is shader pre-cache data in both the internal storage and the selected external storage for that game, the script will DELETE the compatibility data in internal storage and create a symbolic link to the existing shader pre-cache data in the selected external storage. External storage is prioritized.
+5. If the game's compatibility data has already been moved to the external storage drive, the game will be skipped for compatibility data and the script will check for shader data for that game.
+6. If the game's shader pre-cache data has already been moved to the external storage drive, the game will be skipped for shader pre-cache data and the script will proceed to the next game until it's done.
+
+This script will NOT:
+
+1. Move compatibility and shader pre-cache data back from the selected external storage drive back to internal storage. If you need to do that, please use any of the other scripts that can move data both ways: moveCacheLocation.sh, sendCacheToExternalStorage.sh, or transferCacheToSDCard.sh.
+2. Verify that the compatibility and shader pre-cache data that will be moved to the external storage will fit in there before moving it. It will just attempt to move it with brute force. It will move on to the next title if there isn't enough storage space for the current one.
+3. Create symbolic links in internal storage for games that don't have their compatibility or pe-cached shader data directories created.
+
+Yes, this works for ALL games on MicroSD card or external storage in one run. This is an all or nothing script. I'm still testing it out, but it seems to be working fine on MicroSD card. I lack USB storage on my Deck, so I can't test it in that scenario. What this script does is that it just moves all compatibility and pre-cached shader data that it finds to the MicroSD card or to the selected storage. It uses the same menu to select the storage target as the sendCacheToExternalStorage.sh script. The MicroSD card is the /run/media/mmcblk0p1 location so choose that for MicroSD card.
+
+Since the script will skip games that it doesn't need to interact with (because it's already moved their data), it's safe to run multiple times if you install more games to the MicroSD card or the external storage later. You can also run transferCacheToSDCard.sh or sendCacheToExternalStorage.sh on a specific game whose compatibility or pre-cached shader data you need to move back to internal storage if performance sees a hit after moving the data out of it.
+
+As usual, I plan to make a video about this script later on, and probably another video explaining the different use cases for each script so users can choose which one will work the best for their needs.
+
+

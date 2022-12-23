@@ -1,6 +1,6 @@
 #!/bin/bash
 
-########################################## SCRIPT VERSION: 0.85 - DO NOT UES YET - WIP!!!! #####################################################
+########################################## SCRIPT VERSION: 0.90 - DO NOT UES YET - WIP!!!! #####################################################
 ################################################################################################################ sendCacheToExternalStorage.sh##
 ###################                                                                                                              ###############
 ###################----------------------------------------------WORK IN PROGRESS------------------------------------------------###############
@@ -80,6 +80,7 @@ echo;
 echo "===================This script is provided as-is, with no warranties written or implied.==================="; echo
 echo "The worst that could happen after running it is that you may have to manually move some files around if it fails."; echo
 echo "I have performed numerous tests to make sure that it works as expected, but there may be a critter or two lurking about that I haven't caught."; echo
+echo "Also, whether you're working with an SD Card, SSD, or any other storage, any storage that's not the default internal storage will be called External Storage by this script."
 echo "=========================With all of that out of the way, do you wish to proceed?=========================="; echo
 
 select yn in "Yes" "No"; do
@@ -105,35 +106,45 @@ timeout_monitor() {
    echo "You may want to try another mount point."
    echo "Yes, you may see a weird grep error if you repeat last command. Working on how to fix that; shouldn't be a serious issue."
    kill "$1"
+   exit 1
 }
 
 build_transfer_menu () {
-  echo "This operation will move compatibility and shader pre-cache data from Internal storage to the selected storage mount or back if it's already been moved."
-  echo "Select a game to run the operation on:"
-  echo
-  #############################################################################
-  #############################################################################
-  echo "We are in testing phase right now. Please return the storage selected:"
-  echo "$sCardPath"
-  echo "Test done."
-  #############################################################################
-  #############################################################################
-  echo
+#### Setting the paths for the operation:
+  sLocalCompatDataRoot="/home/deck/.local/share/Steam/steamapps/compatdata"
+  sLocalShaderCacheRoot="/home/deck/.local/share/Steam/steamapps/shadercache"
+  if [[ $sLibraryType == "gamingMode" ]]; then
+    sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
+    sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
+    sCardCompatDataRoot="$sCardPath/steamapps/compatdata"
+    sCardShaderCacheRoot="$sCardPath/steamapps/shadercache"
+    sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
+    sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
+  elif [[ $sLibraryType == "desktopMode" ]]; then
+    ## Need to verify these paths to make sure that they work in Steam Deck just like they do on PC Desktop mode.
+    echo
+    echo "A note on external libraries since you chose one:"
+    echo "I don't use my Steam Deck with USB drives."
+    echo "Thus, I am assuming that the Steam Desktop Client was used to install in such a drive."
+    echo "That means that the games should be in a directory called SteamLibrary located in the mount point selected."
+    echo "If that's the case, this script should work. It found games in it, so you've gotten this far. That's good!"
+    echo "So, knowing the information above, do you still wish to proceed?"
+    sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
+    sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
+    sCardCompatDataRoot="$sCardPath/SteamLibrary/compatdata"
+    sCardShaderCacheRoot="$sCardPath/SteamLibrary/shadercache"
+    sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
+    sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
+  fi
   select nGame; do
     # Check the selected menu item number
     if [ 1 -le "$REPLY" ] && [ "$REPLY" -le $# ]; then
       sSelectedGame=$(echo "$nGame" | grep -oP '(?<=-).*' | sed -e 's/\_/\ /g')
       nSteamId=$(echo "$nGame" | egrep -o '^[^-]+')
       echo "-------------------------------------------------------------------------------------------------------------"
-      echo "The selected game from this Steam Deck is \"$sSelectedGame.\""; echo
+      echo "The selected game from this Steam Deck is $sSelectedGame."; echo
       echo "The App ID for the selected game is $nSteamId."; echo
-      echo "Do you wish to proceed with the selection of \"$sSelectedGame,\" a game with an App ID of $nSteamId?"; echo
-      sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
-      sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
-      sCardCompatDataRoot="$sCardPath/steamapps/compatdata"
-      sCardShaderCacheRoot="$sCardPath/steamapps/shadercache"
-      sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
-      sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
+      echo "Do you wish to proceed with the selection of $sSelectedGame, a game with an App ID of $nSteamId?"; echo
       select yn in "Yes" "No"; do
         case $yn in
           Yes )
@@ -154,7 +165,7 @@ build_transfer_menu () {
               echo
               ############ Code to verify if the files are located in the current micro SD card and to ask to move them to internal storage goes here:
               sleep 1s
-              echo "Do you want to move $sSelectedGame's compatibility data back to internal storage if it is present in the micro SD card currently located in the Micro SD card slot?"
+              echo "Do you want to move $sSelectedGame's compatibility data back to internal storage if it is present in the External Storage selected above?"
               sleep 1s
               echo
               select yn in "Yes" "No"; do
@@ -162,7 +173,7 @@ build_transfer_menu () {
                   Yes ) ## This path will move the compatibility data directory back to internal storage if it exists: ## Needs a bug check.
                     echo
                     if [[ -d "$sCardCompatDataPath" ]]; then
-                      echo "Verifying size of compatibility data on Micro SD card and available Internal Storage space."
+                      echo "Verifying size of compatibility data on External Storage and available Internal Storage space."
                       nCount=0
                       while [[ $nCount -lt 5 ]]; do
                         printf .
@@ -173,7 +184,7 @@ build_transfer_menu () {
                       nCompatDataSize=$(du "$sCardCompatDataPath" -d 0 | cut -f1)
                       if [[ $nInternalFreeAbsolute -gt $nCompatDataSize ]]; then
                         echo
-                        echo "Moving compatibility data back from Micro SD to Internal Storage!"
+                        echo "Moving compatibility data back from External Storage to Internal Storage!"
                         echo
                         nCount=0
                         while [[ $nCount -lt 5 ]]; do
@@ -200,11 +211,11 @@ build_transfer_menu () {
                         echo
                         echo "Internal storage only has $nInternalFreeReadable space left."
                         echo "The compatibility data directory requires $nCompatDatasizeReadable of space available."
-                        echo "That's not enough space to move the selected compatibility data from Micro SD card back to Internal Storage."
+                        echo "That's not enough space to move the selected compatibility data from External Storage back to Internal Storage."
                         echo
                       fi
                     else
-                      echo "Warning: The current MicroSD card does not contain this title's compatibility data. No data to move back."
+                      echo "Warning: The selected External Storage location does not contain this title's compatibility data. No data to move back."
                       echo "The script will now exit."
                       echo ">>>>>Goodbye!<<<<<"; echo
                       exit 0
@@ -220,10 +231,10 @@ build_transfer_menu () {
             elif [[ -d "$sLocalCompatDataPath" && -d "$sCardCompatDataPath" ]]; then
               echo
               echo "=================================================================================================================================="
-              echo "WARNING: We have found compatibility data directories for $sSelectedGame in both Internal Storage and the MicroSD card."
-              echo "This script will prioritize the compatibility data path in the MicroSD card as its aim is to save internal storage space."
+              echo "WARNING: We have found compatibility data directories for $sSelectedGame in both Internal and External Storage."
+              echo "This script will prioritize the compatibility data path in the external storage as its aim is to save internal storage space."
               echo "To achieve this, the internal storage compatibility data path will be DELETED."
-              echo "A symbolic link will be created in internal storage pointing to the compatibility data path in the MicroSD card."
+              echo "A symbolic link will be created in internal storage pointing to the compatibility data path in the selected External Storage."
               echo "Do you really wish to proceed?"
               echo
               select yn in "Yes" "No"; do
@@ -248,11 +259,11 @@ build_transfer_menu () {
                     echo
                     sleep 3s
                     nCardFreeReadable=$(df -h | grep -n "$sCardPath" | awk '{print $4}')
-                    echo "Micro SD card has $nCardFreeReadable storage space left after moving compatibility data to it."
+                    echo "External Storage has $nCardFreeReadable storage space left after moving compatibility data to it."
                     echo
                     break;;
                   No )
-                    echo "You have chosen to keep both internal and MicroSD card compatibility data directories."
+                    echo "You have chosen to keep both internal and External Storage compatibility data directories."
                     echo "$sSelectedGame's data has not been transferred anywhere."
                     echo "The script will now exit."
                     echo ">>>>>Goodbye!<<<<<"; echo
@@ -269,7 +280,7 @@ build_transfer_menu () {
               select yn in "Yes" "No"; do
                 case $yn in
                   Yes ) ## This path will move the compatibility data directory to micro SD card. Checking space on card first.
-                    echo;echo "Verifying available space on Micro SD card and size of compatibility data directory."
+                    echo;echo "Verifying available space on External Storage and size of compatibility data directory."
                     nCount=0
                     while [[ $nCount -lt 5 ]]; do
                       printf .
@@ -279,8 +290,8 @@ build_transfer_menu () {
                     nCardFreeAbsolute=$(df | grep "$sCardPath" | awk '{print $4}')
                     nCompatDataSize=$(du "$sLocalCompatDataPath" -d 0 | cut -f1)
                     if [[ $nCardFreeAbsolute -gt $nCompatDataSize ]]; then
-                      echo;echo "Moving compatibility data directory to micro SD card, please wait."
-                      echo "Do not, under any circumstance, remove the micro SD card while this operation runs."
+                      echo;echo "Moving compatibility data directory to External Storage, please wait."
+                      echo "Do not, under any circumstance, tamper with the External Storage while this operation runs."
                       echo
                       nCount=0
                       while [[ $nCount -lt 5 ]]; do
@@ -413,7 +424,7 @@ build_transfer_menu () {
             echo
             echo "=================================================================================================================================="
             echo "WARNING: We have found shader pre-cache data directories for $sSelectedGame in both Internal Storage and the MicroSD card."
-            echo "This script will prioritize the shder pre-cache data path in the MicroSD card as its aim is to save internal storage space."
+            echo "This script will prioritize the shader pre-cache data path in the external storage as its aim is to save internal storage space."
             echo "To achieve this, the internal storage shader pre-cache data path will be DELETED."
             echo "A symbolic link will be created in internal storage pointing to the shader pre-cache data path in the MicroSD card."
             echo "Do you really wish to proceed?"
@@ -556,12 +567,28 @@ build_storage_menu () {
           Yes )
             echo
             echo "Proceeding. Let's go!"
+            nCount=0
+            while [[ $nCount -lt 15 ]]; do
+              printf \>
+              sleep 0.05s
+              ((nCount++))
+            done
             sCardPath="$nSelectedStorage"
             timeout_monitor "$$" &
             Timeout_monitor_pid=$!
-            aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+            if [[ $sCardPath == "/run/media/mmcblk0p1" ]]; then
+              echo
+              echo "Scanning for Steam games on your MicroSD card path, please wait."
+              sLibraryType="gamingMode"
+              aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+            else
+              echo
+              echo "Scanning for Steam games on what seems to be a Steam desktop client library, please wait."
+              sLibraryType="desktopMode"
+              aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name SteamLibrary -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+            fi
             kill "$Timeout_monitor_pid"
-            build_transfer_menu "${aGameList[@]}"
+            migrate_game_caches "${aGameList[@]}"
             break;;
           No )
             echo "Got it. Feel free to try again with another selection later on!"

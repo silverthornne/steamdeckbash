@@ -301,9 +301,9 @@ build_transfer_menu ()
               echo "There is no compatibility data for $sSelectedGame. Moving on to shader pre-cache data."
             fi
           ############ Done with Compatibility Data.
-              ############ Shader Cache from this line on.
-              ############ Creepy crawlies are sure to be around.
-              ############ LET'S DO THEEEEEEZZZZZZ
+          ############ Shader Cache from this line on.
+          ############ Creepy crawlies are sure to be around.
+          ############ LET'S DO THEEEEEEZZZZZZ
           if [[ -h "$sLocalShaderCachePath" ]]; then
             ## Code that validates whether the internal shader cache data path exists:"
             echo
