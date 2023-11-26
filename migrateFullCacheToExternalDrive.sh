@@ -146,8 +146,8 @@ migrate_game_caches () {
     echo "So, knowing the information above, do you still wish to proceed?"
     sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
     sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
-    sCardCompatDataRoot="$sCardPath/SteamLibrary/compatdata"
-    sCardShaderCacheRoot="$sCardPath/SteamLibrary/shadercache"
+    sCardCompatDataRoot="$sCardPath/SteamLibrary/steamapps/compatdata"
+    sCardShaderCacheRoot="$sCardPath/SteamLibrary/steamapps/shadercache"
     sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
     sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
     select yn in "Yes" "No"; do
@@ -354,6 +354,8 @@ migrate_game_caches () {
         echo | /usr/bin/tee -a $fLogFile
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" | /usr/bin/tee -a $fLogFile
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" | /usr/bin/tee -a $fLogFile
+        echo | /usr/bin/tee -a $fLogFile
+        echo "[$dIterationDay at $dIterationTime] ================================================================================" >> $fLogFile
         echo "When we started, the Internal Storage Drive had $nInternalFreeAtStartReadable of storage available." | /usr/bin/tee -a $fLogFile
         echo "The Internal Storage Drive now has $nInternalFreeAtEndReadable of storage available." | /usr/bin/tee -a $fLogFile
         echo "How about that? Woot!" | /usr/bin/tee -a $fLogFile
@@ -404,7 +406,7 @@ build_storage_menu () {
               echo
               echo "Scanning for Steam games on what seems to be a Steam desktop client library, please wait."
               sLibraryType="desktopMode"
-              aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name SteamLibrary -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+              aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
             fi
             kill "$Timeout_monitor_pid"
             migrate_game_caches "${aGameList[@]}"

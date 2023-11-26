@@ -1,4 +1,10 @@
 # steamdeckbash
+
+# BIG UPDATE [Novemeber 26, 2023]
+Valve pushed an update that changes the default mount location for the MicroSD card. This shouldn't have a negative consequence if you had already used the script to move data around, but unfortunately it won't allow you run the script again.
+
+The transferCacheToExternalStorage.sh, and moveCacheLocation.sh scripts have been updated to reflect this change. I don't use USB storage on my Steam Deck, so I am not sure how to make it work with these changes on the sendCacheToExternalStorage.sh and the migrateFullCacheToExternalDrive.sh scripts.
+
 # Overview
 
 This is simply meant to be a collection of a few bash scripts created to add functionality to or to make the Steam Deck (or other Steam OS devices I suppose) a little more convenient to use.

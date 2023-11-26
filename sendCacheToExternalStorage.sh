@@ -1,6 +1,6 @@
 #!/bin/bash
 
-########################################## SCRIPT VERSION: 0.90 - DO NOT UES YET - WIP!!!! #####################################################
+########################################## SCRIPT VERSION: 0.95 - Release Candidate - May work :) ##############################################
 ################################################################################################################ sendCacheToExternalStorage.sh##
 ###################                                                                                                              ###############
 ###################----------------------------------------------WORK IN PROGRESS------------------------------------------------###############
@@ -58,7 +58,13 @@ cat << "HEREDOCINTRO"
 HEREDOCINTRO
 
 ##### From my understanding, SteamDecks mount the Micro SD card in the following path. Change it if your MicroSD card has a different mounting point.
-sCardPath="/run/media/mmcblk0p1"
+#sCardPath="/run/media/mmcblk0p1"
+sCardPathOne="/run/media"
+sCardPathTwo=$(ls -lrt /run/media | grep -oP '(?<=/deck/)\w+.*')
+sCardPath="$sCardPathOne/deck/$sCardPathTwo"
+echo
+echo "The microSD card path is $sCardPath"
+sleep 1
 ##### If the locations of the compatibility data and shader cache change in some future SteamOS update, just update these *Root variables to reflect the new location:
 sLocalCompatDataRoot="/home/deck/.local/share/Steam/steamapps/compatdata"
 sLocalShaderCacheRoot="/home/deck/.local/share/Steam/steamapps/shadercache"
@@ -131,8 +137,8 @@ build_transfer_menu () {
     echo "So, knowing the information above, do you still wish to proceed?"
     sLocalCompatDataPath="$sLocalCompatDataRoot/$nSteamId"
     sLocalShaderCachePath="$sLocalShaderCacheRoot/$nSteamId"
-    sCardCompatDataRoot="$sCardPath/SteamLibrary/compatdata"
-    sCardShaderCacheRoot="$sCardPath/SteamLibrary/shadercache"
+    sCardCompatDataRoot="$sCardPath/SteamLibrary/steamapps/compatdata"
+    sCardShaderCacheRoot="$sCardPath/SteamLibrary/steamapps/shadercache"
     sCardCompatDataPath="$sCardCompatDataRoot/$nSteamId"
     sCardShaderCachePath="$sCardShaderCacheRoot/$nSteamId"
   fi
@@ -585,7 +591,7 @@ build_storage_menu () {
               echo
               echo "Scanning for Steam games on what seems to be a Steam desktop client library, please wait."
               sLibraryType="desktopMode"
-              aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name SteamLibrary -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
+              aGameList=($(/usr/bin/grep -e name $(find "$sCardPath" -maxdepth 1 -name steamapps -printf "%h/%f/*appmanifest* ") | grep -v ".acf.*.tmp.*" | sed -e 's/^.*_//;s/name//;s/.acf://;s/"//g;s/\ /_/g;s/\t\{1,3\}/-/g'))
             fi
             kill "$Timeout_monitor_pid"
             migrate_game_caches "${aGameList[@]}"
